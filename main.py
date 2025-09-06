@@ -61,7 +61,7 @@ def salidaMenuComparativas():
     print("\n")
     if eleccion_2 == 0:
         imprimirMenuDeComparativas()
-        eleccion_3 = logica.validarInput()
+        eleccion_3 = logica.validarInput(0, 3)
         return eleccion_3
 
 def menu():
@@ -121,5 +121,6 @@ def menu():
 # Entry point #
 
 menu()
+
 
 
