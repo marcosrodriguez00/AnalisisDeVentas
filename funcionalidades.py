@@ -1,6 +1,7 @@
 # funcionalidades.py
 
 import logica
+import random
 
 def crecimientoVentas():
     """
@@ -8,7 +9,26 @@ def crecimientoVentas():
     Ejemplo: comparar las ventas de este año contra las del año pasado
     y devolver el porcentaje de aumento o disminución.
     """
-    print(">> Crecimiento de ventas (en construcción)")
+    maximo = 500
+    minimo = 50
+    matriz = []
+    productos = ["Zapatillas", "Remera", "Short", "Campera"]
+    num = random.randint(1, 25)
+    antes = 2000 + num -1
+    despues = 2000 + num
+    for i in range(len(productos)):
+        resultados = []
+        ventas_antes = random.randint(minimo, maximo)
+        ventas_despues = random.randint(minimo, maximo)
+        crecimiento = ((ventas_despues - ventas_antes) / ventas_antes) * 100
+        resultados =  [productos[i]] +[ventas_antes] + [ventas_despues] + [crecimiento]
+        matriz.append(resultados)
+    print(f"Comparacion de ventas de entre los años {antes} y {despues}")
+    print("-"*50)
+    print("%-14s%-10s%-10s%-16s" %('Productos',antes,despues,'Crecimiento%'))
+    print("-"*50)
+    for i in range(len(productos)):
+        print("%-14s%-10d%-10d%-16.2f" %(matriz[i][0],matriz[i][1],matriz[i][2],matriz[i][3]))
 
 def productosMasVendidos():
     """
