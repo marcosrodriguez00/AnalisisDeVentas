@@ -16,7 +16,6 @@ def imprimirMenuDeComparativas():
     print("-" * 30)
 
 # Menu principal #
-
 def printMainMenu():
     print("====================================")
     print("   📊 Plataforma de Análisis de Ventas")
@@ -34,52 +33,90 @@ def printMainMenu():
     print("0) Salir")
     print("------------------------------------")
 
+# Regreso al meno principal
+def salidaMenuInicio():
+    print("\n")
+    print("Ingrese 0 para volver al menu de principal")
+    eleccion_2 = int(input())
+    while eleccion_2 != 0:
+        logica.error()
+        print("Ingrese 0 para volver al menu de principal")
+        eleccion_2 = int(input())
+    
+    if eleccion_2 == 0:
+        printMainMenu()
+        eleccion_3 = logica.validarInput()
+        return eleccion_3
+
+# Regreso al meno de comparativas
+def salidaMenuComparativas():
+    print("\n")
+    print("Ingrese 0 para volver al menu de comparataivas")
+    eleccion_2 = int(input())
+    while eleccion_2 != 0:
+        logica.error()
+        print("Ingrese 0 para volver al menu de comparataivas")
+        eleccion_2 = int(input())
+    print("Volviendo al menu principal")
+    print("\n")
+    if eleccion_2 == 0:
+        imprimirMenuDeComparativas()
+        eleccion_3 = logica.validarInput()
+        return eleccion_3
+
 def menu():
 
-    eleccion = -1
+    printMainMenu()
+    eleccion = logica.validarInput()
     
     while eleccion != 0:
-        printMainMenu()
-        eleccion = logica.validarInput()
 
-        if eleccion == 0:
-            print("Saliendo del programa... 👋")
-        
-        elif eleccion == 1:
+        if eleccion == 1:
             funcionalidades.crecimientoVentas()
+            eleccion = salidaMenuInicio()
         
         elif eleccion == 2:
             funcionalidades.productosMasVendidos()
-        
+            eleccion = salidaMenuInicio()
+            
         elif eleccion == 3:
             funcionalidades.clientesMasRelevantes()
+            eleccion = salidaMenuInicio()
         
         elif eleccion == 4:
             funcionalidades.ticketPromedioDeVenta()
+            eleccion = salidaMenuInicio()
         
         elif eleccion == 5:
             funcionalidades.ventasPorPeriodo()
+            eleccion = salidaMenuInicio()
         
         elif eleccion == 6:
             imprimirMenuDeComparativas()
             tipoDeComparativa = logica.validarInput(0, 3)
             if tipoDeComparativa == 1:
                 funcionalidades.comparativaProducto()
+                tipoDeComparativa = salidaMenuComparativas()
             elif tipoDeComparativa == 2:
                 funcionalidades.comparativaCliente()
             elif tipoDeComparativa == 3:
                 funcionalidades.comparativaRegion()
             elif tipoDeComparativa == 0:
-                print("Volviendo al menu principal")
-        
+                eleccion = salidaMenuInicio()
+
         elif eleccion == 7:
             funcionalidades.tendenciaDeCrecimiento()
+            eleccion = salidaMenuInicio()
         
         elif eleccion == 8:
             funcionalidades.tendenciaDeCrecimiento()
-
+            eleccion = salidaMenuInicio()
+            
+    if eleccion == 0:
+        print("Saliendo del programa... 👋")
         print("\n")
-
+        
 # Entry point #
 
 menu()
+
