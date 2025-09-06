@@ -1,27 +1,9 @@
 import os
 import sys
 import funcionalidades
+import logica
 
-# Helpers de UI #
-
-# printea un error en consola #
-def error():
-    print("ERROR: La opcion no es valida.")
-    
-# pide un input y verifica que sea valido para el menu principal #
-def validarInput(min=0, max=8):
-    opcion = -1
-
-    while opcion < min or opcion > max:
-        try:
-            opcion = int(input("Elija una opción (0-8): "))
-            if opcion < min or opcion > max:
-                print("⚠️ La opción debe estar entre 0 y 8.")
-        except ValueError:
-            print("⚠️ Debe ingresar un número entero.")
-            opcion = -1
-
-    return opcion
+# -- Helpers de UI -- #
 
 # Printea un minimenu para elegir tipo de comparativas #
 def imprimirMenuDeComparativas():
@@ -44,7 +26,7 @@ def printMainMenu():
     print("2) Productos más vendidos (Top-N)")
     print("3) Clientes más relevantes")
     print("4) Ticket promedio de venta")
-    print("5) Estacionalidad / Ventas por periodo")
+    print("5) Ventas por periodo")
     print("6) Comparativa producto / cliente / región")
     print("7) Participación de mercado interno")
     print("8) Tendencia de crecimiento acumulado")
@@ -54,11 +36,11 @@ def printMainMenu():
 
 def menu():
 
-    eleccion = -1  # valor inicial inválido
+    eleccion = -1
     
     while eleccion != 0:
         printMainMenu()
-        eleccion = validarInput()
+        eleccion = logica.validarInput()
 
         if eleccion == 0:
             print("Saliendo del programa... 👋")
@@ -80,7 +62,7 @@ def menu():
         
         elif eleccion == 6:
             imprimirMenuDeComparativas()
-            tipoDeComparativa = validarInput(0, 3)
+            tipoDeComparativa = logica.validarInput(0, 3)
             if tipoDeComparativa == 1:
                 funcionalidades.comparativaProducto()
             elif tipoDeComparativa == 2:
@@ -91,7 +73,7 @@ def menu():
                 print("Volviendo al menu principal")
         
         elif eleccion == 7:
-            funcionalidades.participacion()
+            funcionalidades.tendenciaDeCrecimiento()
         
         elif eleccion == 8:
             funcionalidades.tendenciaDeCrecimiento()
