@@ -99,8 +99,10 @@ def menu():
                 tipoDeComparativa = salidaMenuComparativas()
             elif tipoDeComparativa == 2:
                 funcionalidades.comparativaCliente()
+                tipoDeComparativa = salidaMenuComparativas()
             elif tipoDeComparativa == 3:
                 funcionalidades.comparativaRegion()
+                tipoDeComparativa = salidaMenuComparativas()
             elif tipoDeComparativa == 0:
                 eleccion = salidaMenuInicio()
 
@@ -119,4 +121,5 @@ def menu():
 # Entry point #
 
 menu()
+
 
