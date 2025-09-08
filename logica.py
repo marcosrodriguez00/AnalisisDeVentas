@@ -12,13 +12,16 @@ def validarInput(min=0, max=8):
     opcion = -1
 
     while opcion < min or opcion > max:
-        try:
-            opcion = int(input(f"Elija una opción ({min}-{max}): "))
-            if opcion < min or opcion > max:
-                print(f"⚠️ La opción debe estar entre {min} y {max}.")
-        except ValueError:
-            print("⚠️ Debe ingresar un número entero.")
-            opcion = -1  # fuerza a repetir el ciclo
+        if (min == 0 and max == 0):
+            opcion = int(input())
+        else: 
+            try:
+                opcion = int(input(f"Elija una opción ({min}-{max}): "))
+                if opcion < min or opcion > max:
+                    print(f"⚠️ La opción debe estar entre {min} y {max}.")
+            except ValueError:
+                print("⚠️ Debe ingresar un número entero.")
+                opcion = -1  # fuerza a repetir el ciclo
 
     return opcion
 
