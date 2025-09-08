@@ -88,10 +88,40 @@ def clientesMasRelevantes():
 
 def ticketPromedioDeVenta():
     """
-    Calcular el ticket promedio.
-    Es decir, el promedio de dinero que se genera por cada venta realizada.
+    Calcula el ticket promedio de un conjunto de ventas simuladas.
+    Cada venta = [cantidad, precio_unitario].
     """
-    print(">> Ticket promedio de venta (en construcción)")
+    # Creamos una lista de ventas aleatorias (matriz)
+    ventas = []
+    for i in range(random.randint(5, 12)):   # entre 5 y 12 ventas
+        cantidad = random.randint(1, 30)
+        precio_unitario = round(random.uniform(20, 300), 2)
+        ventas.append([cantidad, precio_unitario])
+ 
+    # Mostramos las ventas generadas
+    print("\n=== VENTAS GENERADAS ===")
+    for i, fila in enumerate(ventas, start=1):
+        print(f"Venta {i}: {fila[0]} unidades x ${fila[1]}")
+ 
+    # Calculamos el ticket promedio
+    total = 0.0
+    cant_ventas = 0
+    for fila in ventas:
+        if len(fila) != 2:
+            continue
+        cantidad, precio = fila
+        total += cantidad * precio
+        cant_ventas += 1
+ 
+    if cant_ventas == 0:
+        print("⚠️ No hay ventas válidas.")
+        return
+ 
+    ticket = total / cant_ventas
+    print("\n=== TICKET PROMEDIO ===")
+    print(f"Ventas procesadas: {cant_ventas}")
+    print(f"Facturación total: ${total:,.2f}")
+    print(f"Ticket promedio:  ${ticket:,.2f}")
 
 
 def ventasPorPeriodo():
@@ -132,3 +162,4 @@ def tendenciaDeCrecimiento():
     Ejemplo: ir sumando mes a mes y graficar o listar la evolución.
     """
     print(">> Tendencia de crecimiento acumulado (en construcción)")
+
