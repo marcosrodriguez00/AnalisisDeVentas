@@ -14,8 +14,40 @@ def imprimirMenuDeComparativas():
     print("3) Región")
     print("0) Volver al menú principal")
     print("-" * 30)
+    
+# Regreso al meno principal
+def salidaMenuInicio():
+    print("\n")
+    print("Ingrese 0 para volver al menu de principal")
+    eleccion2 = logica.validarInput(0, 0)
+    while eleccion2 != 0:
+        logica.error()
+        print("Ingrese 0 para volver al menu de principal")
+        eleccion2 = logica.validarInput(0, 0)
+    
+    if eleccion2 == 0:
+        printMainMenu()
+        eleccion3 = logica.validarInput(0, 8)
+        return eleccion3
+    
+# Regreso al meno de comparativas
+def salidaMenuComparativas():
+    print("\n")
+    print("Ingrese 0 para volver al menu de comparataivas")
+    eleccion2 = logica.validarInput(0, 0)
+    while eleccion2 != 0:
+        logica.error()
+        print("Ingrese 0 para volver al menu de comparataivas")
+        eleccion2 = logica.validarInput(0, 0)
+    print("Volviendo al menu principal")
+    print("\n")
+    if eleccion2 == 0:
+        imprimirMenuDeComparativas()
+        eleccion3 = logica.validarInput(0, 3)
+        return eleccion3
 
 # Menu principal #
+
 def printMainMenu():
     print("====================================")
     print("   📊 Plataforma de Análisis de Ventas")
@@ -32,37 +64,6 @@ def printMainMenu():
     print("------------------------------------")
     print("0) Salir")
     print("------------------------------------")
-
-# Regreso al meno principal
-def salidaMenuInicio():
-    print("\n")
-    print("Ingrese 0 para volver al menu de principal")
-    eleccion2 = int(input())
-    while eleccion2 != 0:
-        logica.error()
-        print("Ingrese 0 para volver al menu de principal")
-        eleccion2 = int(input())
-    
-    if eleccion2 == 0:
-        printMainMenu()
-        eleccion3 = logica.validarInput()
-        return eleccion3
-
-# Regreso al meno de comparativas
-def salidaMenuComparativas():
-    print("\n")
-    print("Ingrese 0 para volver al menu de comparataivas")
-    eleccion2 = int(input())
-    while eleccion2 != 0:
-        logica.error()
-        print("Ingrese 0 para volver al menu de comparataivas")
-        eleccion2 = int(input())
-    print("Volviendo al menu principal")
-    print("\n")
-    if eleccion2 == 0:
-        imprimirMenuDeComparativas()
-        eleccion3 = logica.validarInput(0, 3)
-        return eleccion3
 
 def menu():
 
@@ -91,27 +92,18 @@ def menu():
             funcionalidades.ventasPorPeriodo()
             eleccion = salidaMenuInicio()
 
-         elif eleccion == 6:
+        elif eleccion == 6:
             imprimirMenuDeComparativas()
             tipoDeComparativa = logica.validarInput(0, 3)
             if tipoDeComparativa == 1:
                 funcionalidades.comparativaProducto()
-                tipoDeComparativa = salidaMenuComparativas()
-                if tipoDeComparativa == 0:
-                    printMainMenu()
-                    eleccion = logica.validarInput()
+                eleccion = salidaMenuInicio()
             elif tipoDeComparativa == 2:
                 funcionalidades.comparativaCliente()
-                tipoDeComparativa = salidaMenuComparativas()
-                if tipoDeComparativa == 0:
-                    printMainMenu()
-                    eleccion = logica.validarInput()
+                eleccion = salidaMenuInicio()
             elif tipoDeComparativa == 3:
                 funcionalidades.comparativaRegion()
-                tipoDeComparativa = salidaMenuComparativas()
-                if tipoDeComparativa == 0:
-                    printMainMenu()
-                    eleccion = logica.validarInput()
+                eleccion = salidaMenuInicio()
             elif tipoDeComparativa == 0:
                 printMainMenu()
                 eleccion = logica.validarInput()
@@ -127,11 +119,7 @@ def menu():
     if eleccion == 0:
         print("Saliendo del programa... 👋")
         print("\n")
-        
+
 # Entry point #
 
 menu()
-
-
-
-
