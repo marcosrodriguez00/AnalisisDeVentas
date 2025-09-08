@@ -33,10 +33,68 @@ def crecimientoVentas():
 def productosMasVendidos():
     """
     Listar los productos más vendidos.
-    Puede mostrar un Top-N (ej: Top 5) ordenado por unidades vendidas
+    Puede mostrar un Top-5 ordenado por unidades vendidas
     o por facturación total.
     """
-    print(">> Listado de productos más vendidos (en construcción)")
+    # Datos de ejemplo [producto, cantidad, precio unitario]
+    ventas = [
+        ["Zapatillas Running", 10, 120.5],
+        ["Remera Deportiva",   25,  45.0],
+        ["Zapatillas Running",  5, 120.5],
+        ["Short Entrenamiento",12,  60.0],
+        ["Campera Rompeviento", 3, 210.0],
+        ["Remera Deportiva",   30,  45.0],
+    ]
+    
+    # lista acumuladora [producto, unidades_totales, facturacion_total]
+    acumulado = []
+    
+    # Armamos la lista que acumula todas las ventas por producto
+    
+    i = 0
+    while i < len(ventas):
+        prod = ventas[i][0]
+        cant = ventas[i][1]
+        precio = ventas[i][2]
+        fact = cant * precio
+        
+        j = logica.indiceEnLista(acumulado, prod)
+        if j != -1:
+            # El producto ya existe en la lista asi que lo acumulamos
+            acumulado[j][1] = acumulado[j][1] + cant
+            acumulado[j][2] = acumulado[j][2] + fact
+        else:
+            # Si no existe el producto lo agregamos a la lista acumulada
+            acumulado.append([prod, cant, fact])
+        i = i + 1
+                          
+    # Construimos listas ordenadas para cada categoria (por unidad y por facturación)
+    
+    # ordena la lista acumulada de mayor a menor según el valor de la columna de unidades vendidas
+    topUnidades = sorted(acumulado, key=lambda fila: fila[1], reverse=True)
+    # ordena la lista acumulada de mayor a menor según el valor de la columna de facturación total
+    topFacturacion = sorted(acumulado, key=lambda fila: fila[2], reverse=True)
+    
+    # Imprimir la tabla
+    
+    print("\nTop 5 Productos — Por Unidades / Por Facturación")
+    print("-" * 70)
+    print(f"{'#':<3} {'Por Unidades':<32} {'Por Facturación':<32}")
+    print("-" * 70)
+    
+    if len(acumulado) > 5:
+        limite = 5
+    else:
+        limite = len(acumulado)
+        
+    fila = 0
+    while fila < limite:
+        nombre_u = topUnidades[fila][0]
+        unidades = topUnidades[fila][1]
+        nombre_f = topFacturacion[fila][0]
+        fact     = topFacturacion[fila][2]
+        print(f"{fila+1:<3} {nombre_u:<20} ({unidades:>3} u)   {nombre_f:<20} ($ {fact:>7.2f})")
+        fila = fila + 1
 
 def clientesMasRelevantes():
     """
@@ -105,24 +163,23 @@ def ticketPromedioDeVenta():
  
     # Calculamos el ticket promedio
     total = 0.0
-    cant_ventas = 0
+    cantVentas = 0
     for fila in ventas:
         if len(fila) != 2:
             continue
         cantidad, precio = fila
         total += cantidad * precio
-        cant_ventas += 1
+        cantVentas += 1
  
-    if cant_ventas == 0:
+    if cantVentas == 0:
         print("⚠️ No hay ventas válidas.")
         return
  
-    ticket = total / cant_ventas
+    ticket = total / cantVentas
     print("\n=== TICKET PROMEDIO ===")
-    print(f"Ventas procesadas: {cant_ventas}")
+    print(f"Ventas procesadas: {cantVentas}")
     print(f"Facturación total: ${total:,.2f}")
     print(f"Ticket promedio:  ${ticket:,.2f}")
-
 
 def ventasPorPeriodo():
     """
@@ -162,4 +219,4 @@ def tendenciaDeCrecimiento():
     Ejemplo: ir sumando mes a mes y graficar o listar la evolución.
     """
     print(">> Tendencia de crecimiento acumulado (en construcción)")
-
+    
