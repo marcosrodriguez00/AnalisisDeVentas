@@ -24,11 +24,11 @@ def crecimientoVentas():
         resultados =  [productos[i]] +[ventas_antes] + [ventas_despues] + [crecimiento]
         matriz.append(resultados)
     print(f"Comparacion de ventas de entre los años {antes} y {despues}")
-    print("-"*50)
-    print("%-14s%-10s%-10s%-16s" %('Productos',antes,despues,'Crecimiento%'))
-    print("-"*50)
+    print("-"*60)
+    print("%-15s%-13s%-13s%-19s" %('Productos',antes,despues,'Crecimiento%'))
+    print("-"*60)
     for i in range(len(productos)):
-        print("%-14s%-10d%-10d%-16.2f" %(matriz[i][0],matriz[i][1],matriz[i][2],matriz[i][3]))
+        print("%-15s%-13d%-13d%-19.2f" %(matriz[i][0],matriz[i][1],matriz[i][2],matriz[i][3]))
 
 def productosMasVendidos():
     """
@@ -157,7 +157,10 @@ def ticketPromedioDeVenta():
         ventas.append([cantidad, precio_unitario])
  
     # Mostramos las ventas generadas
-    print("\n=== VENTAS GENERADAS ===")
+    cadena = 'VENTAS GENERADAS'
+    cadena2 = cadena.center(30,'=')
+    print("\n")
+    print(cadena2)
     for i, fila in enumerate(ventas, start=1):
         print(f"Venta {i}: {fila[0]} unidades x ${fila[1]}")
  
@@ -176,7 +179,10 @@ def ticketPromedioDeVenta():
         return
  
     ticket = total / cantVentas
-    print("\n=== TICKET PROMEDIO ===")
+    cadena3 = 'TICKET PROMEDIO'
+    cadena4 = cadena3.center(30,'=')
+    print("\n")
+    print(cadena4)
     print(f"Ventas procesadas: {cantVentas}")
     print(f"Facturación total: ${total:,.2f}")
     print(f"Ticket promedio:  ${ticket:,.2f}")
@@ -220,3 +226,4 @@ def tendenciaDeCrecimiento():
     """
     print(">> Tendencia de crecimiento acumulado (en construcción)")
     
+
