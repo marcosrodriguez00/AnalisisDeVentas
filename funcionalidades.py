@@ -194,7 +194,8 @@ def ventasPorPeriodo():
     """
     suma_mes = 0
     lista = []
-    mes=["ENERO","FEBRERO","MARZO","ABRIL","MAYO","JUNIO","JULIO","AGOSTO","SEPTIEMBRE","OCTUBRE","NOVIEMBRE","DICIEMBRE"]    
+    mes = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+             "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]    
     mensaje = 'Analisis de Ventas por Periodos'
     cadena = mensaje.center(61,' ')
     print(cadena)
@@ -316,6 +317,7 @@ def tendenciaDeCrecimiento():
         print(f"{mes:<12}{ventas:<12}{acum:<12}{barras}")
 
     
+
 
 
 
