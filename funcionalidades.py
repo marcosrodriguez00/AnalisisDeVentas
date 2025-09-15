@@ -195,8 +195,6 @@ def ventasPorPeriodo():
     """
     suma_mes = 0
     lista = []
-    productos = ["Zapatillas", "Remera", "Short", "Campera"]
-    num = random.randint(1, 25)
     mes=["ENERO","FEBRERO","MARZO","ABRIL","MAYO","JUNIO","JULIO","AGOSTO","SEPTIEMBRE","OCTUBRE","NOVIEMBRE","DICIEMBRE"]    
     mensaje = 'Analisis de Ventas por Periodos'
     cadena = mensaje.center(61,' ')
@@ -252,5 +250,6 @@ def tendenciaDeCrecimiento():
     """
     print(">> Tendencia de crecimiento acumulado (en construcción)")
     
+
 
 
