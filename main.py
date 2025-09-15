@@ -64,9 +64,9 @@ def printMainMenu():
     print("6) Comparativa producto / cliente / región")
     print("7) Participación de mercado interno")
     print("8) Tendencia de crecimiento acumulado")
-    print("-" * 60)
+    print("------------------------------------")
     print("0) Salir")
-    print("-" * 60)
+    print("------------------------------------")
 
 def menu():
 
@@ -126,4 +126,3 @@ def menu():
 # Entry point #
 
 menu()
-
