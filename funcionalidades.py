@@ -188,7 +188,6 @@ def ticketPromedioDeVenta():
     print(f"Ticket promedio:  ${ticket:,.2f}")
 
 def ventasPorPeriodo():
-    def ventasPorPeriodo():
     """
     Analizar las ventas en un periodo específico.
     Ejemplo: ver cómo se distribuyen las ventas por mes o por trimestre.
@@ -317,6 +316,7 @@ def tendenciaDeCrecimiento():
         print(f"{mes:<12}{ventas:<12}{acum:<12}{barras}")
 
     
+
 
 
 
