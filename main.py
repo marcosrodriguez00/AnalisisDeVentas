@@ -49,9 +49,12 @@ def salidaMenuComparativas():
 # Menu principal #
 
 def printMainMenu():
-    print("====================================")
-    print("   📊 Plataforma de Análisis de Ventas")
-    print("====================================\n")
+    print("=" * 60)
+    cadena1 = '📊 Plataforma de Análisis de Ventas'
+    cadena2 = cadena1.center(60,' ')
+    print(cadena2)
+    print("=" * 60)
+    print("\n")
     print("Seleccione una opción:\n")
     print("1) Crecimiento de ventas")
     print("2) Productos más vendidos (Top-N)")
@@ -61,9 +64,9 @@ def printMainMenu():
     print("6) Comparativa producto / cliente / región")
     print("7) Participación de mercado interno")
     print("8) Tendencia de crecimiento acumulado")
-    print("------------------------------------")
+    print("-" * 60)
     print("0) Salir")
-    print("------------------------------------")
+    print("-" * 60)
 
 def menu():
 
@@ -123,3 +126,4 @@ def menu():
 # Entry point #
 
 menu()
+
