@@ -440,27 +440,30 @@ def comparativaRegion():
         print("Empate")
 
 def tendenciaDeCrecimiento():
+     """
+    Mostrar la tendencia de crecimiento de las ventas mes a mes en porcentaje
+    respecto al total anual (sin acumulado).
     """
-    Mostrar la tendencia de crecimiento acumulado de las ventas.
-    Ejemplo: ir sumando mes a mes y graficar o listar la evolución.
-    """
-    meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
 
-    acumulado = 0
+    meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+             "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
+
     ventas_mensuales = []
 
     # Generar ventas aleatorias entre 100 y 500
     for mes in meses:
         ventas = random.randint(100, 500)
-        acumulado += ventas
-        ventas_mensuales.append([mes, ventas, acumulado])
+        ventas_mensuales.append([mes, ventas])
+
+    # Calcular total anual
+    total = sum(v[1] for v in ventas_mensuales)
 
     # Mostrar resultados en tabla
-    print("\nTendencia de crecimiento acumulado de las ventas:")
+    print("\nPorcentaje de ventas por mes (respecto al total anual):")
     print("-" * 50)
-    print(f"{'Mes':<12}{'Ventas':<12}{'Acumulado':<12}{'Tendencia'}")
+    print(f"{'Mes':<12}{'Ventas':<12}{'Porcentaje'}")
     print("-" * 50)
 
-    for mes, ventas, acum in ventas_mensuales:
-        barras = "*" * (acum // 100)  # una barra cada 100 unidades
-        print(f"{mes:<12}{ventas:<12}{acum:<12}{barras}")
+    for mes, ventas in ventas_mensuales:
+        porcentaje = (ventas / total) * 100
+
