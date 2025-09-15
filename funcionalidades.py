@@ -188,12 +188,38 @@ def ticketPromedioDeVenta():
     print(f"Ticket promedio:  ${ticket:,.2f}")
 
 def ventasPorPeriodo():
+    def ventasPorPeriodo():
     """
     Analizar las ventas en un periodo específico.
     Ejemplo: ver cómo se distribuyen las ventas por mes o por trimestre.
     """
-    print(">> Ventas por periodo (en construcción)")
-
+    suma_mes = 0
+    lista = []
+    productos = ["Zapatillas", "Remera", "Short", "Campera"]
+    num = random.randint(1, 25)
+    mes=["ENERO","FEBRERO","MARZO","ABRIL","MAYO","JUNIO","JULIO","AGOSTO","SEPTIEMBRE","OCTUBRE","NOVIEMBRE","DICIEMBRE"]    
+    mensaje = 'Analisis de Ventas por Periodos'
+    cadena = mensaje.center(61,' ')
+    print(cadena)
+    print("-" * 61)
+    print("%-16s%-16s%-16s%10s" %('Mes','Cant. x Mes','Cant. x Trimestre','% Crec.'))
+    print("-" * 61)
+    for i in range(len(mes)):
+        print("%-16s" % mes[i], end="")
+        cant_ventas = random.randint(10000,50000)
+        lista.append(cant_ventas)
+        suma_mes = cant_ventas + suma_mes
+        if (i+1) % 3 == 0:
+            cont = 0
+            print("%-16d" % cant_ventas, end="")
+            print("%-16d" % suma_mes, end="")
+            prom = ((lista[cont+2]-lista[cont])/lista[cont])*100
+            print("%10.3f" % prom,"%")
+            suma_mes = 0
+            lista.clear()
+        else:
+            print("%-12d" % cant_ventas) 
+    print("\n")
 
 def comparativaProducto():
     """
@@ -226,4 +252,5 @@ def tendenciaDeCrecimiento():
     """
     print(">> Tendencia de crecimiento acumulado (en construcción)")
     
+
 
