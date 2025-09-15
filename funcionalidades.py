@@ -240,16 +240,84 @@ def comparativaRegion():
     Comparar las ventas entre dos regiones distintas.
     Ejemplo: Buenos Aires vs Córdoba.
     """
-    print(">> Comparativa de regiones (en construcción)")
+       productos = ["Zapatillas", "Remera", "Short", "Campera"]
+    regiones = ["Buenos Aires", "Cordoba"]
 
+    matriz = []  # [producto, ventas_BA, ventas_CBA]
+
+    # Generar ventas aleatorias para cada producto y región
+    for prod in productos:
+        ventas_ba = random.randint(100, 500)
+        ventas_cba = random.randint(100, 500)
+        matriz.append([prod, ventas_ba, ventas_cba])
+
+    # Mostrar resultados
+    print("\nComparativa de ventas entre regiones:")
+    print("-" * 45)
+    print(f"{'Producto':<15}{regiones[0]:<12}{regiones[1]:<12}{'Mayor'}")
+    print("-" * 45)
+
+    total_ba = 0
+    total_cba = 0
+
+    for fila in matriz:
+        prod = fila[0]
+        ba = fila[1]
+        cba = fila[2]
+
+        # Sumar totales por región
+        total_ba += ba
+        total_cba += cba
+
+        # Ver cuál región vendió más para este producto
+        if ba > cba:
+            mayor = regiones[0]
+        elif cba > ba:
+            mayor = regiones[1]
+        else:
+            mayor = "Empate"
+
+        print(f"{prod:<15}{ba:<12}{cba:<12}{mayor}")
+
+    print("-" * 45)
+    print(f"{'TOTAL':<15}{total_ba:<12}{total_cba:<12}", end="")
+
+    if total_ba > total_cba:
+        print(f"Gana {regiones[0]}")
+    elif total_cba > total_ba:
+        print(f"Gana {regiones[1]}")
+    else:
+        print("Empate")
 
 def tendenciaDeCrecimiento():
     """
     Mostrar la tendencia de crecimiento acumulado de las ventas.
     Ejemplo: ir sumando mes a mes y graficar o listar la evolución.
     """
-    print(">> Tendencia de crecimiento acumulado (en construcción)")
+     meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+             "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
+
+    acumulado = 0
+    ventas_mensuales = []
+
+    # Generar ventas aleatorias entre 100 y 500
+    for mes in meses:
+        ventas = random.randint(100, 500)
+        acumulado += ventas
+        ventas_mensuales.append([mes, ventas, acumulado])
+
+    # Mostrar resultados en tabla
+    print("\nTendencia de crecimiento acumulado de las ventas:")
+    print("-" * 50)
+    print(f"{'Mes':<12}{'Ventas':<12}{'Acumulado':<12}{'Tendencia'}")
+    print("-" * 50)
+
+    for mes, ventas, acum in ventas_mensuales:
+        barras = "*" * (acum // 100)  # una barra cada 100 unidades
+        print(f"{mes:<12}{ventas:<12}{acum:<12}{barras}")
+
     
+
 
 
 
