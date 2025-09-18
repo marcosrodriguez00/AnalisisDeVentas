@@ -440,7 +440,7 @@ def comparativaRegion():
         print("Empate")
 
 def tendenciaDeCrecimiento():
-     """
+    """
     Mostrar la tendencia de crecimiento de las ventas mes a mes en porcentaje
     respecto al total anual (sin acumulado).
     """
@@ -466,4 +466,5 @@ def tendenciaDeCrecimiento():
 
     for mes, ventas in ventas_mensuales:
         porcentaje = (ventas / total) * 100
+
 
