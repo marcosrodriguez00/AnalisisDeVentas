@@ -466,5 +466,7 @@ def tendenciaDeCrecimiento():
 
     for mes, ventas in ventas_mensuales:
         porcentaje = (ventas / total) * 100
+        print(f"{mes:<12}{ventas:<12}{porcentaje:5.1f}%")
+
 
 
