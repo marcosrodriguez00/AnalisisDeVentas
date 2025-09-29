@@ -33,18 +33,15 @@ def salidaMenuInicio():
 # Regreso al meno de comparativas
 def salidaMenuComparativas():
     print("\n")
-    print("Ingrese 0 para volver al menu de comparataivas")
-    eleccion2 = logica.validarInput(0, 0)
-    while eleccion2 != 0:
+    print("Ingrese 6 para volver al menu de comparataivas")
+    eleccion2 = int(input())
+    while eleccion2 != 6:
         logica.error()
-        print("Ingrese 0 para volver al menu de comparataivas")
-        eleccion2 = logica.validarInput(0, 0)
-    print("Volviendo al menu principal")
+        print("Ingrese 6 para volver al menu de comparataivas")
+        eleccion2 = int(input())
+    print("Volviendo al menu de comparativas")
     print("\n")
-    if eleccion2 == 0:
-        imprimirMenuDeComparativas()
-        eleccion3 = logica.validarInput(0, 3)
-        return eleccion3
+    return eleccion2
 
 # Menu principal #
 
@@ -64,9 +61,9 @@ def printMainMenu():
     print("6) Comparativa producto / cliente / región")
     print("7) Participación de mercado interno")
     print("8) Tendencia de crecimiento acumulado")
-    print("------------------------------------")
+    print("-" * 60)
     print("0) Salir")
-    print("------------------------------------")
+    print("-" * 60)
 
 def menu():
 
@@ -95,22 +92,22 @@ def menu():
             funcionalidades.ventasPorPeriodo()
             eleccion = salidaMenuInicio()
 
-        elif eleccion == 6:
+        while eleccion == 6:
             imprimirMenuDeComparativas()
             tipoDeComparativa = logica.validarInput(0, 3)
             if tipoDeComparativa == 1:
                 funcionalidades.comparativaProducto()
-                eleccion = salidaMenuInicio()
+                eleccion = salidaMenuComparativas()
             elif tipoDeComparativa == 2:
                 funcionalidades.comparativaCliente()
-                eleccion = salidaMenuInicio()
+                eleccion = salidaMenuComparativas()
             elif tipoDeComparativa == 3:
                 funcionalidades.comparativaRegion()
-                eleccion = salidaMenuInicio()
+                eleccion = salidaMenuComparativas()
             elif tipoDeComparativa == 0:
                 printMainMenu()
                 eleccion = logica.validarInput()
-
+                
         elif eleccion == 7:
             funcionalidades.tendenciaDeCrecimiento()
             eleccion = salidaMenuInicio()
@@ -126,3 +123,4 @@ def menu():
 # Entry point #
 
 menu()
+
