@@ -76,19 +76,19 @@ def menu():
             funcionalidades.crecimientoVentas()
             eleccion = salidaMenuInicio()
         
-        elif eleccion == 2:
+        if eleccion == 2:
             funcionalidades.productosMasVendidos()
             eleccion = salidaMenuInicio()
             
-        elif eleccion == 3:
+        if eleccion == 3:
             funcionalidades.clientesMasRelevantes()
             eleccion = salidaMenuInicio()
         
-        elif eleccion == 4:
+        if eleccion == 4:
             funcionalidades.ticketPromedioDeVenta()
             eleccion = salidaMenuInicio()
         
-        elif eleccion == 5:
+        if eleccion == 5:
             funcionalidades.ventasPorPeriodo()
             eleccion = salidaMenuInicio()
 
@@ -108,11 +108,11 @@ def menu():
                 printMainMenu()
                 eleccion = logica.validarInput()
                 
-        elif eleccion == 7:
+        if eleccion == 7:
             funcionalidades.tendenciaDeCrecimiento()
             eleccion = salidaMenuInicio()
         
-        elif eleccion == 8:
+        if eleccion == 8:
             funcionalidades.tendenciaDeCrecimiento()
             eleccion = salidaMenuInicio()
             
@@ -123,4 +123,5 @@ def menu():
 # Entry point #
 
 menu()
+
 
