@@ -1,32 +1,56 @@
 import logica
 import random
 
+def dato():
+    lista = []
+    try:
+        arch = open("/Users/tomasulisesruiz/Downloads/ventas_antes_despues.txt","rt")
+        linea = arch.readline()
+        while linea:
+            if ':' in linea:
+                pos = linea.index(':')
+                dato = linea[(pos + 2): ].strip()
+                lista.append(dato)
+            linea = arch.readline()
+    except FileNotFoundError:
+        print("No se encontró el archivo 'detalle_ventas_productos.txt'.")
+    except OSError:
+        print("No se puede leer el archivo 'detalle_ventas_productos.txt'.")
+    finally:
+        try:
+            arch.close()
+        except:
+            pass
+        
+    lista_fecha = lista[ : : 4]
+    lista_producto = lista[ 1: : 4]
+    lista_cant = lista[ 2: : 4]
+    lista_precio = lista[ 3: : 4]
+    return lista_fecha, lista_producto, lista_cant, lista_precio    
+
 def crecimientoVentas():
     """
     Calcular el crecimiento de ventas en un periodo de tiempo.
     Ejemplo: comparar las ventas de este año contra las del año pasado
     y devolver el porcentaje de aumento o disminución.
     """
-    maximo = 500
-    minimo = 50
+    fecha, productos, cantidad, precio = dato()
     matriz = []
-    productos = ["Zapatillas", "Remera", "Short", "Campera"]
-    num = random.randint(1, 25)
-    antes = 2000 + num -1
-    despues = 2000 + num
-    for i in range(len(productos)):
+    antes = fecha[0]
+    despues = fecha[-1]
+    for i in range(len(productos)//2):
         resultados = []
-        ventas_antes = random.randint(minimo, maximo)
-        ventas_despues = random.randint(minimo, maximo)
-        crecimiento = ((ventas_despues - ventas_antes) / ventas_antes) * 100
-        resultados =  [productos[i]] +[ventas_antes] + [ventas_despues] + [crecimiento]
+        ventas_antes = cantidad[i]
+        ventas_despues = cantidad[4 + i]
+        crecimiento = ((int(ventas_despues) - int(ventas_antes)) / int(ventas_antes)) * 100
+        resultados =  [productos[i]] + [ventas_antes] + [ventas_despues] + [crecimiento]
         matriz.append(resultados)
-    print(f"Comparacion de ventas de entre los años {antes} y {despues}")
-    print("-"*50)
-    print("%-14s%-10s%-10s%-16s" %('Productos',antes,despues,'Crecimiento%'))
-    print("-"*50)
-    for i in range(len(productos)):
-        print("%-14s%-10d%-10d%-16.2f" %(matriz[i][0],matriz[i][1],matriz[i][2],matriz[i][3]))
+    print(f"Comparacion de ventas de entre las fechas {antes} y {despues}")
+    print("-"*68)
+    print("%-14s%-14s%-14s%-16s" %('Productos',antes,despues,'Crecimiento%'))
+    print("-"*68)
+    for i in range(len(productos)//2):
+        print("%-14s%-14s%-14s%-16.2f" %(matriz[i][0],matriz[i][1],matriz[i][2],matriz[i][3]))
 
 def productosMasVendidos():
     """
@@ -467,6 +491,7 @@ def tendenciaDeCrecimiento():
     for mes, ventas in ventas_mensuales:
         porcentaje = (ventas / total) * 100
         print(f"{mes:<12}{ventas:<12}{porcentaje:5.1f}%")
+
 
 
 
