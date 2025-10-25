@@ -4,7 +4,7 @@ import random
 def dato():
     lista = []
     try:
-        arch = open("/Users/tomasulisesruiz/Downloads/ventas_antes_despues.txt","rt")
+        arch = open("/Users/tomasulisesruiz/Downloads/data.txt","rt")
         linea = arch.readline()
         while linea:
             if ':' in linea:
@@ -13,20 +13,25 @@ def dato():
                 lista.append(dato)
             linea = arch.readline()
     except FileNotFoundError:
-        print("No se encontró el archivo 'detalle_ventas_productos.txt'.")
+        print("No se encontró el archivo 'data.txt'.")
     except OSError:
-        print("No se puede leer el archivo 'detalle_ventas_productos.txt'.")
+        print("No se puede leer el archivo 'data.txt'.")
     finally:
         try:
             arch.close()
         except:
             pass
         
-    lista_fecha = lista[ : : 4]
-    lista_producto = lista[ 1: : 4]
-    lista_cant = lista[ 2: : 4]
-    lista_precio = lista[ 3: : 4]
-    return lista_fecha, lista_producto, lista_cant, lista_precio    
+    lista_fecha = lista[ : : 8]
+    lista_id_producto = lista[ 1: : 8]
+    lista_producto = lista[ 2: : 8]
+    lista_id_cliente = lista[ 3: : 8]
+    lista_cliente = lista[ 4: : 8]
+    lista_cant = lista[ 5: : 8]
+    lista_precio = lista[ 6: : 8]
+    lista_region = lista[ 7: : 8]
+    
+    return lista_fecha, lista_id_producto, lista_producto, lista_id_cliente, lista_cliente, lista_cant, lista_precio, lista_region   
 
 def crecimientoVentas():
     """
@@ -34,23 +39,31 @@ def crecimientoVentas():
     Ejemplo: comparar las ventas de este año contra las del año pasado
     y devolver el porcentaje de aumento o disminución.
     """
-    fecha, productos, cantidad, precio = dato()
+    fecha, id_producto, productos, id_cliente, cliente, cantidad, precio, region = dato()
     matriz = []
     antes = fecha[0]
     despues = fecha[-1]
-    for i in range(len(productos)//2):
+    lista_rep = []
+    for i in range(len(id_producto)):
+        if id_producto.count(id_producto[i]) != 1 and lista_rep.count(id_producto[i]) == 0:
+            lista_rep.append(id_producto[i])
+        if id_producto.count(id_producto[i]) == 1:
+            lista_rep.append(id_producto[i])
+    for i in range(len(lista_rep)):
         resultados = []
-        ventas_antes = cantidad[i]
-        ventas_despues = cantidad[4 + i]
+        pos1 = id_producto.index(lista_rep[i])
+        pos2 = id_producto.index(lista_rep[i], (i + 1))
+        ventas_antes = cantidad[pos1]
+        ventas_despues = cantidad[pos2]
         crecimiento = ((int(ventas_despues) - int(ventas_antes)) / int(ventas_antes)) * 100
-        resultados =  [productos[i]] + [ventas_antes] + [ventas_despues] + [crecimiento]
+        resultados =  [productos[pos1]] + [ventas_antes] + [ventas_despues] + [crecimiento]
         matriz.append(resultados)
     print(f"Comparacion de ventas de entre las fechas {antes} y {despues}")
     print("-"*68)
-    print("%-14s%-14s%-14s%-16s" %('Productos',antes,despues,'Crecimiento%'))
+    print("%-24s%-14s%-14s%-16s" %('Productos','Antes','Despues','Crecimiento%'))
     print("-"*68)
-    for i in range(len(productos)//2):
-        print("%-14s%-14s%-14s%-16.2f" %(matriz[i][0],matriz[i][1],matriz[i][2],matriz[i][3]))
+    for i in range(len(lista_rep)):
+        print("%-24s%-14s%-14s%-16.2f" %(matriz[i][0],matriz[i][1],matriz[i][2],matriz[i][3]))
 
 def productosMasVendidos():
     """
@@ -491,6 +504,7 @@ def tendenciaDeCrecimiento():
     for mes, ventas in ventas_mensuales:
         porcentaje = (ventas / total) * 100
         print(f"{mes:<12}{ventas:<12}{porcentaje:5.1f}%")
+
 
 
 
