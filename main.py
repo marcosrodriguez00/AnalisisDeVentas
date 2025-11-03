@@ -71,7 +71,7 @@ def printMainMenu():
     print("\n")
     print("Seleccione una opción:\n")
     print("1) Crecimiento de ventas")
-    print("2) Productos más vendidos (Top-N)")
+    print("2) Productos más vendidos (Top-5)")
     print("3) Clientes más relevantes")
     print("4) Ticket promedio de venta")
     print("5) Ventas por periodo")
@@ -97,41 +97,68 @@ def menu():
                 eleccion = salidaMenuInicio()
         
         if eleccion == 2:
+            categoria = imprimirMenuDeCategorias()
+            if categoria:
+                print(f"Has seleccionado la categoría: {categoria}")
+                #funcionalidades.productosMasVendidos()
+                eleccion = salidaMenuInicio()
             funcionalidades.productosMasVendidos()
-            eleccion = salidaMenuInicio()
             
         if eleccion == 3:
-            funcionalidades.clientesMasRelevantes()
-            eleccion = salidaMenuInicio()
+            categoria = imprimirMenuDeCategorias()
+            if categoria:
+                print(f"Has seleccionado la categoría: {categoria}")
+                #funcionalidades.clientesMasRelevantes()
+                eleccion = salidaMenuInicio()
         
         if eleccion == 4:
-            funcionalidades.ticketPromedioDeVenta()
-            eleccion = salidaMenuInicio()
+            categoria = imprimirMenuDeCategorias()
+            if categoria:
+                print(f"Has seleccionado la categoría: {categoria}")
+                #funcionalidades.ticketPromedioDeVenta()
+                eleccion = salidaMenuInicio()
         
         if eleccion == 5:
-            funcionalidades.ventasPorPeriodo()
-            eleccion = salidaMenuInicio()
-
+            categoria = imprimirMenuDeCategorias()
+            if categoria:
+                print(f"Has seleccionado la categoría: {categoria}")
+                #funcionalidades.ventasPorPeriodo()
+                eleccion = salidaMenuInicio()
+            
         while eleccion == 6:
             imprimirMenuDeComparativas()
             tipoDeComparativa = logica.validarInput(0, 3)
             if tipoDeComparativa == 1:
-                funcionalidades.comparativaProducto()
-                eleccion = salidaMenuInicio()
+                categoria = imprimirMenuDeCategorias()
+                if categoria:
+                    print(f"Has seleccionado la categoría: {categoria}")
+                    #funcionalidades.comparativaProducto()
+                    eleccion = salidaMenuInicio()
+                
             elif tipoDeComparativa == 2:
-                funcionalidades.comparativaCliente()
-                eleccion = salidaMenuInicio()
+                categoria = imprimirMenuDeCategorias()
+                if categoria:
+                    print(f"Has seleccionado la categoría: {categoria}")
+                    #funcionalidades.comparativaCliente()
+                    eleccion = salidaMenuInicio()
+                
             elif tipoDeComparativa == 0:
                 printMainMenu()
                 eleccion = logica.validarInput(0, 9)
                 
         if eleccion == 7:
-            funcionalidades.tendenciaDeCrecimiento()
-            eleccion = salidaMenuInicio()
+            categoria = imprimirMenuDeCategorias()
+            if categoria:
+                print(f"Has seleccionado la categoría: {categoria}")
+                #funcionalidades.tendenciaDeCrecimiento()
+                eleccion = salidaMenuInicio()
         
         if eleccion == 8:
-            funcionalidades.comparativaCanal()
-            eleccion = salidaMenuInicio()
+            categoria = imprimirMenuDeCategorias()
+            if categoria:
+                print(f"Has seleccionado la categoría: {categoria}")
+                #funcionalidades.comparativaCanal()
+                eleccion = salidaMenuInicio()    
             
     if eleccion == 0:
         print("Saliendo del programa... 👋")
