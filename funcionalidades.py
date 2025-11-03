@@ -3,7 +3,7 @@ import random
 
 def cargarDatosCSV():
     """
-    Lee un archivo CSV de ventas sin usar csv ni readlines().
+    Lee un archivo CSV de ventas.
     Devuelve listas paralelas con cada columna.
     """
 
@@ -11,6 +11,7 @@ def cargarDatosCSV():
     lista_fecha = []
     lista_id_producto = []
     lista_producto = []
+    lista_categoria = [] 
     lista_id_cliente = []
     lista_cliente = []
     lista_cantidad = []
@@ -21,7 +22,7 @@ def cargarDatosCSV():
 
     try:
         # Abrimos el archivo
-        arch = open("ventas_dataset_1000.csv", mode="r")
+        arch = open("ventas_dataset_extendido.csv", mode="r")
 
         # Variable auxiliar para saber si estamos parados en la primera línea (encabezados)
         primera_linea = True
@@ -44,34 +45,36 @@ def cargarDatosCSV():
             partes = linea.split(",")
 
             # Evitamos filas incompletas (ventas donde falten datos)
-            if len(partes) < 10:
+            if len(partes) < 11:
                 continue
 
-            # Asignamos los campos
+            # Asignamos campos (formato fijo de 11 columnas)
             fecha = partes[0]
             id_prod = partes[1]
             producto = partes[2]
-            id_cli = partes[3]
-            cliente = partes[4]
+            categoria = partes[3]
+            id_cli = partes[4]
+            cliente = partes[5]
 
-            # Validamos tipos numéricos
             try:
-                cantidad = int(partes[5])
+                cantidad = int(partes[6])
             except ValueError:
                 cantidad = 0
+
             try:
-                precio = float(partes[6])
+                precio = float(partes[7])
             except ValueError:
                 precio = 0.0
 
-            region = partes[7]
-            canal = partes[8]
-            IDfactura = partes[9]
+            region = partes[8]
+            canal = partes[9]
+            IDfactura = partes[10]
 
-            # Guardamos los valores en sus listas
+            # Guardamos en las listas
             lista_fecha.append(fecha)
             lista_id_producto.append(id_prod)
             lista_producto.append(producto)
+            lista_categoria.append(categoria)
             lista_id_cliente.append(id_cli)
             lista_cliente.append(cliente)
             lista_cantidad.append(cantidad)
@@ -81,7 +84,7 @@ def cargarDatosCSV():
             lista_factura.append(IDfactura)
 
         arch.close()
-
+        
     except FileNotFoundError:
         print("No se encontró el archivo.")
         return None

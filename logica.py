@@ -59,3 +59,49 @@ def formatear_mes(clave_ym):
     }
     nombre = nombres_mes.get(mes_num, mes_num)
     return f"{nombre} {anio}"
+
+def obtenerCategoriasUnicas():
+    """
+    Lee el archivo CSV de ventas y devuelve una lista
+    con las categorías únicas encontradas.
+    """
+
+    categorias_unicas = []
+
+    try:
+        arch = open("ventas_dataset_extendido.csv", mode="r")
+
+        primera_linea = True
+
+        for linea in arch:
+            linea = linea.strip()
+            if linea == "":
+                continue
+
+            # saltamos encabezado
+            if primera_linea:
+                primera_linea = False
+                continue
+
+            partes = linea.split(",")
+
+            # evitamos filas incompletas
+            if len(partes) < 11:
+                continue
+
+            categoria = partes[3].strip()
+
+            # agregamos si no está ya en la lista
+            if categoria != "" and categoria not in categorias_unicas:
+                categorias_unicas.append(categoria)
+
+        arch.close()
+
+    except FileNotFoundError:
+        print("No se encontró el archivo.")
+        return []
+    except OSError:
+        print("No se pudo leer el archivo.")
+        return []
+
+    return categorias_unicas
