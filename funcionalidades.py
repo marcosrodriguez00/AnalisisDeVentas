@@ -22,7 +22,7 @@ def cargarDatosCSV():
 
     try:
         # Abrimos el archivo
-        arch = open("ventas_dataset_extendido.csv", mode="r")
+        arch = open("ventas_dataset_sin_tildes.csv", mode="r")
 
         # Variable auxiliar para saber si estamos parados en la primera línea (encabezados)
         primera_linea = True
@@ -84,7 +84,7 @@ def cargarDatosCSV():
             lista_factura.append(IDfactura)
 
         arch.close()
-        
+
     except FileNotFoundError:
         print("No se encontró el archivo.")
         return None

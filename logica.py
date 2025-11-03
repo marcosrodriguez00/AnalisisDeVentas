@@ -69,7 +69,7 @@ def obtenerCategoriasUnicas():
     categorias_unicas = []
 
     try:
-        arch = open("ventas_dataset_extendido.csv", mode="r")
+        arch = open("ventas_dataset_sin_tildes.csv", mode="r")
 
         primera_linea = True
 

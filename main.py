@@ -13,8 +13,39 @@ def imprimirMenuDeComparativas():
     print("2) Cliente")
     print("0) Volver al menú principal")
     print("-" * 30)
+
+# Printea un minimenu para elegir categorias #
+def imprimirMenuDeCategorias():
+
+    categorias = logica.obtenerCategoriasUnicas()
+
+    if len(categorias) == 0:
+        print("No se encontraron categorías en el archivo.")
+        return "TODAS"
+
+    print("-" * 30)
+    print("Elija una categoría:")
+    print("0 - TODAS")
+
+    # Recorremos manualmente la lista
+    indice = 1
+    for cat in categorias:
+        print(str(indice) + " - " + cat)
+        indice = indice + 1
+
+    print("-" * 30)
+
+    # Leer selección
+    while True:
+        print("Ingrese el número de la categoría: ")
+        opcion = logica.validarInput(0, len(categorias))
+
+        if opcion == 0:
+            return "TODAS"
+        elif opcion > 0 and opcion <= len(categorias):
+            return categorias[opcion - 1]
     
-# Regreso al meno principal
+# Regreso al menu principal
 def salidaMenuInicio():
     print("\n")
     print("Ingrese 0 para volver al menu de principal")
@@ -29,19 +60,6 @@ def salidaMenuInicio():
         eleccion3 = logica.validarInput(0, 8)
         return eleccion3
     
-# Regreso al meno de comparativas
-def salidaMenuComparativas():
-    print("\n")
-    print("Ingrese 6 para volver al menu de comparataivas")
-    eleccion2 = int(input())
-    while eleccion2 != 6:
-        logica.error()
-        print("Ingrese 6 para volver al menu de comparataivas")
-        eleccion2 = int(input())
-    print("Volviendo al menu de comparativas")
-    print("\n")
-    return eleccion2
-
 # Menu principal #
 
 def printMainMenu():
@@ -57,7 +75,7 @@ def printMainMenu():
     print("3) Clientes más relevantes")
     print("4) Ticket promedio de venta")
     print("5) Ventas por periodo")
-    print("6) Comparativa producto / cliente / región")
+    print("6) Comparativa producto / cliente ")
     print("7) Tendencia de crecimiento acumulado")
     print("8) Comparativa por canal de venta")
     print("-" * 60)
@@ -72,8 +90,11 @@ def menu():
     while eleccion != 0:
 
         if eleccion == 1:
-            funcionalidades.crecimientoVentas()
-            eleccion = salidaMenuInicio()
+            categoria = imprimirMenuDeCategorias()
+            if categoria:
+                print(f"Has seleccionado la categoría: {categoria}")
+                #funcionalidades.crecimientoVentas()
+                eleccion = salidaMenuInicio()
         
         if eleccion == 2:
             funcionalidades.productosMasVendidos()
