@@ -105,3 +105,47 @@ def obtenerCategoriasUnicas():
         return []
 
     return categorias_unicas
+
+def categoria(dato):
+    (
+        lista_fecha,
+        lista_id_producto,
+        lista_producto,
+        lista_categoria,
+        lista_id_cliente,
+        lista_cliente,
+        lista_cantidad,
+        lista_precio,
+        lista_region,
+        lista_canal,
+        lista_factura 
+    )= cargarDatosCSV()
+    
+    lista_producto_c = []
+    lista_cliente_c = []
+    lista_cantidad_c = []
+    lista_precio_c = []
+    lista_region_c = []
+    lista_canal_c = []
+    lista_factura_c = []
+    
+    for i in range(len(lista_producto)):
+        if dato == lista_categoria[i]:
+            lista_fecha_c.append(lista_fecha[i])
+            lista_producto_c.append(lista_producto[i])
+            lista_cliente_c.append(lista_cliente[i])
+            lista_cantidad_c.append(lista_cantidad[i])
+            lista_precio_c.append(lista_precio[i])
+            lista_region_c.append(lista_region[i])
+            lista_canal_c.append(lista_canal[i])
+            lista_factura_c.append(lista_facturacion[i])
+    return (
+        lista_fecha_c,
+        lista_producto_c,
+        lista_cliente_c,
+        lista_cantidad_c,
+        lista_precio_c,
+        lista_region_c,
+        lista_canal_c,
+        lista_factura_c,
+        )
