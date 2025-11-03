@@ -11,7 +11,6 @@ def imprimirMenuDeComparativas():
     print("Elija un parámetro para hacer la comparativa:")
     print("1) Producto")
     print("2) Cliente")
-    print("3) Región")
     print("0) Volver al menú principal")
     print("-" * 30)
     
@@ -59,8 +58,8 @@ def printMainMenu():
     print("4) Ticket promedio de venta")
     print("5) Ventas por periodo")
     print("6) Comparativa producto / cliente / región")
-    print("7) Participación de mercado interno")
-    print("8) Tendencia de crecimiento acumulado")
+    print("7) Tendencia de crecimiento acumulado")
+    print("8) Comparativa por canal de venta")
     print("-" * 60)
     print("0) Salir")
     print("-" * 60)
@@ -68,7 +67,7 @@ def printMainMenu():
 def menu():
 
     printMainMenu()
-    eleccion = logica.validarInput()
+    eleccion = logica.validarInput(0, 9)
     
     while eleccion != 0:
 
@@ -97,23 +96,20 @@ def menu():
             tipoDeComparativa = logica.validarInput(0, 3)
             if tipoDeComparativa == 1:
                 funcionalidades.comparativaProducto()
-                eleccion = salidaMenuComparativas()
+                eleccion = salidaMenuInicio()
             elif tipoDeComparativa == 2:
                 funcionalidades.comparativaCliente()
-                eleccion = salidaMenuComparativas()
-            elif tipoDeComparativa == 3:
-                funcionalidades.comparativaRegion()
-                eleccion = salidaMenuComparativas()
+                eleccion = salidaMenuInicio()
             elif tipoDeComparativa == 0:
                 printMainMenu()
-                eleccion = logica.validarInput()
+                eleccion = logica.validarInput(0, 9)
                 
         if eleccion == 7:
             funcionalidades.tendenciaDeCrecimiento()
             eleccion = salidaMenuInicio()
         
         if eleccion == 8:
-            funcionalidades.tendenciaDeCrecimiento()
+            funcionalidades.comparativaCanal()
             eleccion = salidaMenuInicio()
             
     if eleccion == 0:
@@ -123,5 +119,3 @@ def menu():
 # Entry point #
 
 menu()
-
-

@@ -37,3 +37,25 @@ def indiceEnLista(acumulados, cliente):
         return nombres.index(cliente)  # devuelve la posición
     else:
         return -1  # no está
+
+# Función que formatea el més de formato "YYYY-MM" a "NombreMes YYYY"
+#    "2024-07" -> "Julio 2024"
+def formatear_mes(clave_ym):
+    anio = clave_ym[0:4]   # "2024"
+    mes_num = clave_ym[5:7] # "07"
+    nombres_mes = {
+        "01": "Enero",
+        "02": "Febrero",
+        "03": "Marzo",
+        "04": "Abril",
+        "05": "Mayo",
+        "06": "Junio",
+        "07": "Julio",
+        "08": "Agosto",
+        "09": "Septiembre",
+        "10": "Octubre",
+        "11": "Noviembre",
+        "12": "Diciembre"
+    }
+    nombre = nombres_mes.get(mes_num, mes_num)
+    return f"{nombre} {anio}"
