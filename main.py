@@ -92,55 +92,43 @@ def menu():
         if eleccion == 1:
             categoria = imprimirMenuDeCategorias()
             if categoria:
-                print(f"Has seleccionado la categoría: {categoria}")
-                #funcionalidades.crecimientoVentas()
+                funcionalidades.crecimientoVentas(categoria)
                 eleccion = salidaMenuInicio()
         
         if eleccion == 2:
             categoria = imprimirMenuDeCategorias()
             if categoria:
-                print(f"Has seleccionado la categoría: {categoria}")
-                #funcionalidades.productosMasVendidos()
+                funcionalidades.productosMasVendidos(categoria)
                 eleccion = salidaMenuInicio()
-            funcionalidades.productosMasVendidos()
             
         if eleccion == 3:
             categoria = imprimirMenuDeCategorias()
             if categoria:
-                print(f"Has seleccionado la categoría: {categoria}")
-                #funcionalidades.clientesMasRelevantes()
+                funcionalidades.clientesMasRelevantes(categoria)
                 eleccion = salidaMenuInicio()
         
         if eleccion == 4:
             categoria = imprimirMenuDeCategorias()
             if categoria:
-                print(f"Has seleccionado la categoría: {categoria}")
-                #funcionalidades.ticketPromedioDeVenta()
+                funcionalidades.ticketPromedioDeVenta(categoria)
                 eleccion = salidaMenuInicio()
         
         if eleccion == 5:
             categoria = imprimirMenuDeCategorias()
             if categoria:
-                print(f"Has seleccionado la categoría: {categoria}")
-                #funcionalidades.ventasPorPeriodo()
+                funcionalidades.ventasPorPeriodo(categoria)
                 eleccion = salidaMenuInicio()
             
         while eleccion == 6:
             imprimirMenuDeComparativas()
             tipoDeComparativa = logica.validarInput(0, 3)
             if tipoDeComparativa == 1:
-                categoria = imprimirMenuDeCategorias()
-                if categoria:
-                    print(f"Has seleccionado la categoría: {categoria}")
-                    #funcionalidades.comparativaProducto()
-                    eleccion = salidaMenuInicio()
+                funcionalidades.comparativaProducto()
+                eleccion = salidaMenuInicio()
                 
             elif tipoDeComparativa == 2:
-                categoria = imprimirMenuDeCategorias()
-                if categoria:
-                    print(f"Has seleccionado la categoría: {categoria}")
-                    #funcionalidades.comparativaCliente()
-                    eleccion = salidaMenuInicio()
+                funcionalidades.comparativaCliente()
+                eleccion = salidaMenuInicio()
                 
             elif tipoDeComparativa == 0:
                 printMainMenu()
@@ -149,15 +137,13 @@ def menu():
         if eleccion == 7:
             categoria = imprimirMenuDeCategorias()
             if categoria:
-                print(f"Has seleccionado la categoría: {categoria}")
-                #funcionalidades.tendenciaDeCrecimiento()
+                funcionalidades.tendenciaDeCrecimiento(categoria)
                 eleccion = salidaMenuInicio()
         
         if eleccion == 8:
             categoria = imprimirMenuDeCategorias()
             if categoria:
-                print(f"Has seleccionado la categoría: {categoria}")
-                #funcionalidades.comparativaCanal()
+                funcionalidades.comparativaCanal(categoria)
                 eleccion = salidaMenuInicio()    
             
     if eleccion == 0:
