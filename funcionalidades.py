@@ -1,615 +1,580 @@
 import logica
 import random
 
-def cargarDatosCSV():
-    """
-    Lee un archivo CSV de ventas.
-    Devuelve listas paralelas con cada columna.
-    """
+# VARIABLES GLOBALES
+nombre_archivo = "ventas_dataset_sin_tildes.csv"
 
-    # Vamos a guardar los datos en listas paralelas
-    lista_fecha = []
-    lista_id_producto = []
-    lista_producto = []
-    lista_categoria = [] 
-    lista_id_cliente = []
-    lista_cliente = []
-    lista_cantidad = []
-    lista_precio = []
-    lista_region = []
-    lista_canal = []
-    lista_factura = []
+def crecimientoVentas(eleccion):    
+    # PRIMERA PASADA: encontrar todas las claves y el año mínimo/máximo
 
     try:
-        # Abrimos el archivo
-        arch = open("ventas_dataset_sin_tildes.csv", mode="r")
-
-        # Variable auxiliar para saber si estamos parados en la primera línea (encabezados)
-        primera_linea = True
-
-        # Recorremos el archivo línea por línea
-        for linea in arch:
-            # Eliminamos salto de línea y espacios
-            linea = linea.strip()
-
-            # Si está vacía, la saltamos
-            if linea == "":
-                continue
-
-            # Saltamos la linea de encabezados si aparece
-            if primera_linea:
-                primera_linea = False
-                continue
-
-            # Dividimos por coma
-            partes = linea.split(",")
-
-            # Evitamos filas incompletas (ventas donde falten datos)
-            if len(partes) < 11:
-                continue
-
-            # Asignamos campos (formato fijo de 11 columnas)
-            fecha = partes[0]
-            id_prod = partes[1]
-            producto = partes[2]
-            categoria = partes[3]
-            id_cli = partes[4]
-            cliente = partes[5]
-
-            try:
-                cantidad = int(partes[6])
-            except ValueError:
-                cantidad = 0
-
-            try:
-                precio = float(partes[7])
-            except ValueError:
-                precio = 0.0
-
-            region = partes[8]
-            canal = partes[9]
-            IDfactura = partes[10]
-
-            # Guardamos en las listas
-            lista_fecha.append(fecha)
-            lista_id_producto.append(id_prod)
-            lista_producto.append(producto)
-            lista_categoria.append(categoria)
-            lista_id_cliente.append(id_cli)
-            lista_cliente.append(cliente)
-            lista_cantidad.append(cantidad)
-            lista_precio.append(precio)
-            lista_region.append(region)
-            lista_canal.append(canal)
-            lista_factura.append(IDfactura)
-
-        arch.close()
-
-    except FileNotFoundError:
-        print("No se encontró el archivo.")
-        return None
-    except OSError:
-        print("No se pudo leer el archivo.")
-        return None
-
-    # Devolvemos todas las listas juntas
-    return (
-        lista_fecha,
-        lista_id_producto,
-        lista_producto,
-        lista_categoria,
-        lista_id_cliente,
-        lista_cliente,
-        lista_cantidad,
-        lista_precio,
-        lista_region,
-        lista_canal,
-        lista_factura
-    )        
-
-def crecimientoVentas(eleccion):
-    if eleccion == "TODAS":
-        (
-            lista_fecha,
-            lista_id_producto,
-            lista_producto,
-            lista_categoria,
-            lista_id_cliente,
-            lista_cliente,
-            lista_cantidad,
-            lista_precio,
-            lista_region,
-            lista_canal,
-            lista_factura
-        ) = cargarDatosCSV()
-
-        # Extraer el año de cada fecha y crear lista_anio
-
-        lista_anio = []
-        for i in range(len(lista_fecha)):
-            fecha = lista_fecha[i]
-            if "-" in fecha:
-                anio = fecha.split("-")[0]
-            lista_anio.append(anio)
-
-        # Crear lista de productos únicos
-
-        productos_unicos = []
-        for i in range(len(lista_categoria)):
-            producto_actual = lista_categoria[i]
-            repetido = 0
-            for j in range(len(productos_unicos)):
-                if productos_unicos[j] == producto_actual:
-                    repetido = 1
-            if repetido == 0:
-                productos_unicos.append(producto_actual)
-
-        # Crear lista de años únicos
-
-        anios_unicos = []
-        for i in range(len(lista_anio)):
-            anio_actual = lista_anio[i]
-            if anio_actual != "0":
-                repetido = 0
-                for j in range(len(anios_unicos)):
-                    if anios_unicos[j] == anio_actual:
-                        repetido = 1
-                if repetido == 0:
-                    anios_unicos.append(anio_actual)
-
-        # Si hay al menos un año, buscar el mínimo y máximo manualmente
-        if len(anios_unicos) > 0:
-            antes = int(anios_unicos[0])
-            despues = int(anios_unicos[0])
-            for i in range(len(anios_unicos)):
-                actual = int(anios_unicos[i])
-                if actual < antes:
-                    antes = actual
-                if actual > despues:
-                    despues = actual
-        else:
-            antes = 0
-            despues = 0
-
-        # Calcular ventas totales por producto en cada año
-        # Vamos a tener dos listas paralelas: total_antes y total_despues
-        total_antes = []
-        total_despues = []
-
-        for i in range(len(productos_unicos)):
-            total_antes.append(0)
-            total_despues.append(0)
-
-        for i in range(len(lista_producto)):
-            prod = lista_categoria[i]
-            anio = lista_anio[i]
-            try:
-                venta = float(lista_cantidad[i]) * float(lista_precio[i])
-            except:
-                venta = 0.0
-        
-            for j in range(len(productos_unicos)):
-                if prod == productos_unicos[j]:
-                    if anio == str(antes):
-                        total_antes[j] = total_antes[j] + venta
-                    if anio == str(despues):
-                        total_despues[j] = total_despues[j] + venta
-
-        # Calcular crecimiento y armar la matriz
-        
-        matriz = []
-        for i in range(len(productos_unicos)):
-            resultados = []
-            prod = productos_unicos[i]
-            v_antes = total_antes[i]
-            v_desp = total_despues[i]
-            if v_antes != 0:
-                crecimiento = ((v_desp - v_antes) / v_antes) * 100
-            else:
-                crecimiento = 0.0
-            resultados = [prod, v_antes, v_desp, crecimiento]
-            matriz.append(resultados)
-    else:
-        (
-        lista_fecha,
-        lista_producto,
-        lista_cliente,
-        lista_cantidad,
-        lista_precio,
-        lista_region,
-        lista_canal,
-        lista_factura,
-        ) = logica.informeCategorias(eleccion)
-        
-        # Extraer el año de cada fecha y crear lista_anio
-
-        lista_anio = []
-        for i in range(len(lista_fecha)):
-            fecha = lista_fecha[i]
-            if "-" in fecha:
-                anio = fecha.split("-")[0]
-            lista_anio.append(anio)
-
-        # Crear lista de productos únicos
-
-        productos_unicos = []
-        for i in range(len(lista_producto)):
-            producto_actual = lista_producto[i]
-            repetido = 0
-            for j in range(len(productos_unicos)):
-                if productos_unicos[j] == producto_actual:
-                    repetido = 1
-            if repetido == 0:
-                productos_unicos.append(producto_actual)
-
-        # Crear lista de años únicos
-
-        anios_unicos = []
-        for i in range(len(lista_anio)):
-            anio_actual = lista_anio[i]
-            if anio_actual != "0":
-                repetido = 0
-                for j in range(len(anios_unicos)):
-                    if anios_unicos[j] == anio_actual:
-                        repetido = 1
-                if repetido == 0:
-                    anios_unicos.append(anio_actual)
-
-        # Si hay al menos un año, buscar el mínimo y máximo manualmente
-        if len(anios_unicos) > 0:
-            antes = int(anios_unicos[0])
-            despues = int(anios_unicos[0])
-            for i in range(len(anios_unicos)):
-                actual = int(anios_unicos[i])
-                if actual < antes:
-                    antes = actual
-                if actual > despues:
-                    despues = actual
-        else:
-            antes = 0
-            despues = 0
-
-        # Calcular ventas totales por producto en cada año    
-        # Vamos a tener dos listas paralelas: total_antes y total_despues
-        total_antes = []
-        total_despues = []
-
-        for i in range(len(productos_unicos)):
-            total_antes.append(0)
-            total_despues.append(0)
-
-        for i in range(len(lista_producto)):
-            prod = lista_producto[i]
-            anio = lista_anio[i]
-            try:
-                venta = float(lista_cantidad[i]) * float(lista_precio[i])
-            except:
-                venta = 0.0
-        
-            for j in range(len(productos_unicos)):
-                if prod == productos_unicos[j]:
-                    if anio == str(antes):
-                        total_antes[j] = total_antes[j] + venta
-                    if anio == str(despues):
-                        total_despues[j] = total_despues[j] + venta
-
-        # Calcular crecimiento y armar la matriz
-
-        matriz = []
-        for i in range(len(productos_unicos)):
-            resultados = []
-            prod = productos_unicos[i]
-            v_antes = total_antes[i]
-            v_desp = total_despues[i]
-            if v_antes != 0:
-                crecimiento = ((v_desp - v_antes) / v_antes) * 100
-            else:
-                crecimiento = 0.0
-            resultados = [prod, v_antes, v_desp, crecimiento]
-            matriz.append(resultados)
-
-        # ORDENAR MATRIZ ALFABÉTICAMENTE POR NOMBRE DE PRODUCTO
-
-        for i in range(len(matriz) - 1):
-            for j in range(i + 1, len(matriz)):
-                if matriz[i][0] > matriz[j][0]:
-                    # intercambiar filas
-                    aux = matriz[i]
-                    matriz[i] = matriz[j]
-                    matriz[j] = aux
-
-    # Imprimir la tabla como tu versión original
-
-    print(f"Comparacion de ventas de entre los años {antes} y {despues}")
-    print("-" * 90)
-    print("%-30s%-20s%-20s%-26s" % ('Productos', antes, despues, 'Crecimiento%'))
-    print("-" * 90)
-    for i in range(len(matriz)):
-        print("%-30s%-20.2f%-20.2f%-26.2f" % (matriz[i][0], matriz[i][1], matriz[i][2], matriz[i][3]))
-
-def productosMasVendidos(categoria="TODAS"):
-    # CASO 1: TODAS -> Top 5 de todos los productos
-    if categoria == "TODAS":
-        datos = cargarDatosCSV()
-        if datos is None:
-            return
-
-        (lista_fecha,
-         lista_id_producto,
-         lista_producto,
-         lista_categoria,
-         lista_id_cliente,
-         lista_cliente,
-         lista_cantidad,
-         lista_precio,
-         lista_region,
-         lista_canal,
-         lista_factura) = datos 
-
-        acumulado = []  # [producto, unidades_totales, fact_total]
-
-        i = 0
-        while i < len(lista_producto):
-            prod = lista_producto[i]
-            if prod is None or prod == "":
-                i = i + 1
-                continue
-
-            try:
-                cantidad = float(lista_cantidad[i])
-            except:
-                cantidad = 0.0
-            try:
-                precio = float(lista_precio[i])
-            except:
-                precio = 0.0
-
-            fact = cantidad * precio
-
-            j = logica.indiceEnLista(acumulado, prod)
-            if j != -1:
-                acumulado[j][1] = acumulado[j][1] + cantidad
-                acumulado[j][2] = acumulado[j][2] + fact
-            else:
-                acumulado.append([prod, cantidad, fact])
-
-            i = i + 1
-
-        if len(acumulado) == 0:
-            print("\nNo hay productos validos para mostrar.")
-            return
-
-        topUnidades = sorted(acumulado, key=lambda fila: fila[1], reverse=True)
-        topFacturacion = sorted(acumulado, key=lambda fila: fila[2], reverse=True)
-
-        if len(acumulado) > 5:
-            limite = 5
-        else:
-            limite = len(acumulado)
-
-        print("\nTop 5 PRODUCTOS (TODAS las categorias) — Por Unidades / Por Facturacion")
-        print("-" * 74)
-        print(f"{'#':<3} {'Por Unidades':<32} {'Por Facturacion':<32}")
-        print("-" * 74)
-
-        fila = 0
-        while fila < limite:
-            nombre_u = topUnidades[fila][0]
-            unidades = topUnidades[fila][1]
-            nombre_f = topFacturacion[fila][0]
-            fact     = topFacturacion[fila][2]
-            print(f"{fila+1:<3} {nombre_u:<20} ({int(unidades):>3} u)   {nombre_f:<20} ($ {fact:>7.2f})")
-            fila = fila + 1
-
-        return  # fin caso TODAS
-
-    # CASO 2: Categoria especifica -> Productos dentro de una categoria especifica
-    datos = logica.filtrarPorCategoria(categoria)
-    if datos is None:
+        arch = open(nombre_archivo, "r")
+    except:
+        print("No se pudo abrir el archivo.")
         return
 
-    (lista_fecha,
-     lista_id_producto,
-     lista_producto,
-     lista_id_cliente,
-     lista_cliente,
-     lista_cantidad,
-     lista_precio,
-     lista_region,
-     lista_canal,
-     lista_factura) = datos 
+    primero = True
+    antes = 0
+    despues = 0
 
-    acumulado = []  # [producto, unidades, fact]
+    # Usamos diccionarios para rapidez y eficiencia
+    categorias_dict = {}         # clave: categoría
+    productos_dict = {}          # clave: producto dentro de categoría elegida
 
-    i = 0
-    while i < len(lista_producto):
-        producto = lista_producto[i]
-        if producto is None or producto == "":
-            i = i + 1
+    for linea in arch:
+        linea = linea.strip()
+        if linea == "":
             continue
 
+        if primero:
+            primero = False
+            continue
+
+        partes = linea.split(",")
+        if len(partes) < 11:
+            continue
+
+        fecha = partes[0]
+        producto = partes[2]
+        categoria = partes[3]
+
+        # Obtener año
+        if "-" in fecha:
+            parte_anio = fecha.split("-")[0]
+            try:
+                anio = int(parte_anio)
+            except:
+                continue
+        else:
+            continue
+
+        # Año mínimo y máximo
+        if antes == 0 and despues == 0:
+            antes = anio
+            despues = anio
+        else:
+            if anio < antes:
+                antes = anio
+            if anio > despues:
+                despues = anio
+
+        # Caso "TODAS": recolectamos categorías únicas
+        if eleccion == "TODAS":
+            if categoria not in categorias_dict:
+                categorias_dict[categoria] = True
+
+        # Caso categoría elegida: recolectamos productos únicos
+        else:
+            if categoria == eleccion:
+                if producto not in productos_dict:
+                    productos_dict[producto] = True
+
+    arch.close()
+
+   
+    # PREPARAR BASE
+
+
+    if eleccion == "TODAS":
+        lista_base = list(categorias_dict.keys())
+    else:
+        lista_base = list(productos_dict.keys())
+
+    # Preparamos totales por año
+    total_antes = []
+    total_despues = []
+
+    i = 0
+    while i < len(lista_base):
+        total_antes.append(0.0)
+        total_despues.append(0.0)
+        i += 1
+
+  
+    # SEGUNDA PASADA: acumular ventas por categoría o producto
+   
+
+    try:
+        arch = open(nombre_archivo, "r")
+    except:
+        print("No se pudo abrir el archivo en segunda pasada.")
+        return
+
+    primero = True
+
+    for linea in arch:
+        linea = linea.strip()
+        if linea == "":
+            continue
+
+        if primero:
+            primero = False
+            continue
+
+        partes = linea.split(",")
+        if len(partes) < 11:
+            continue
+
+        fecha = partes[0]
+        producto = partes[2]
+        categoria = partes[3]
+
+        # Obtener año
+        if "-" in fecha:
+            try:
+                anio = int(fecha.split("-")[0])
+            except:
+                continue
+        else:
+            continue
+
+        # Cantidad y precio
         try:
-            cantidad = float(lista_cantidad[i])
+            cantidad = float(partes[6])
         except:
             cantidad = 0.0
+
         try:
-            precio = float(lista_precio[i])
+            precio = float(partes[7])
         except:
             precio = 0.0
 
-        fact = cantidad * precio
+        venta = cantidad * precio
 
-        j = logica.indiceEnLista(acumulado, producto)
-        if j != -1:
-            acumulado[j][1] = acumulado[j][1] + cantidad
-            acumulado[j][2] = acumulado[j][2] + fact
+        # Qué comparamos
+        if eleccion == "TODAS":
+            clave = categoria
         else:
-            acumulado.append([producto, cantidad, fact])
+            if categoria != eleccion:
+                continue
+            clave = producto
 
-        i = i + 1
+        # Buscar índice
+        ind = -1
+        j = 0
+        while j < len(lista_base):
+            if lista_base[j] == clave:
+                ind = j
+            j += 1
 
-    if len(acumulado) == 0:
-        print("\nNo hay productos validos para mostrar.")
-        return
+        if ind == -1:
+            continue
 
-    topUnidades = sorted(acumulado, key=lambda fila: fila[1], reverse=True)
-    topFacturacion = sorted(acumulado, key=lambda fila: fila[2], reverse=True)
+        # Acumular
+        if anio == antes:
+            total_antes[ind] += venta
+        if anio == despues:
+            total_despues[ind] += venta
 
-    if len(acumulado) > 5:
-        limite = 5
+    arch.close()
+
+    
+    # ARMAR MATRIZ
+   
+
+    matriz = []
+    i = 0
+    while i < len(lista_base):
+        nombre = lista_base[i]
+        v1 = total_antes[i]
+        v2 = total_despues[i]
+
+        if v1 != 0:
+            crec = ((v2 - v1) / v1) * 100
+        else:
+            crec = 0.0
+
+        matriz.append([nombre, v1, v2, crec])
+        i += 1
+
+    
+    # ORDENAR MATRIZ ALFABÉTICAMENTE
+    
+    
+    i = 0
+    while i < len(matriz) - 1:
+        j = i + 1
+        while j < len(matriz):
+            if matriz[i][0] > matriz[j][0]:
+                aux = matriz[i]
+                matriz[i] = matriz[j]
+                matriz[j] = aux
+            j += 1
+        i += 1
+
+  
+    # IMPRIMIR RESULTADOS
+   
+
+    if eleccion == "TODAS":
+        print(f"\nComparación de ventas por CATEGORÍA entre {antes} y {despues}")
+        print("-" * 90)
+        print("%-30s%-20s%-20s%-20s" %
+              ("Categoría", antes, despues, "Crecimiento %"))
+        print("-" * 90)
     else:
-        limite = len(acumulado)
+        print(f"\nComparación de productos de la categoría '{eleccion}'")
+        print("-" * 90)
+        print("%-30s%-20s%-20s%-20s" %
+              ("Producto", antes, despues, "Crecimiento %"))
+        print("-" * 90)
 
-    print(f"\nTop 5 Productos en '{categoria}' — Por Unidades / Por Facturacion")
-    print("-" * 70)
-    print(f"{'#':<3} {'Por Unidades':<32} {'Por Facturacion':<32}")
-    print("-" * 70)
+    i = 0
+    while i < len(matriz):
+        print("%-30s%-20.2f%-20.2f%-20.2f" %
+              (matriz[i][0], matriz[i][1], matriz[i][2], matriz[i][3]))
+        i += 1
 
-    fila = 0
-    while fila < limite:
-        nombre_u = topUnidades[fila][0]
-        unidades = topUnidades[fila][1]
-        nombre_f = topFacturacion[fila][0]
-        fact     = topFacturacion[fila][2]
-        print(f"{fila+1:<3} {nombre_u:<20} ({int(unidades):>3} u)   {nombre_f:<20} ($ {fact:>7.2f})")
-        fila = fila + 1
 
-def clientesMasRelevantes(categoria="TODAS"):
-    # TODAS: considera todas las ventas
+
+def productosMasVendidos(categoria="TODAS"):
+    # CASO 1 — TODAS LAS CATEGORÍAS → usar diccionario para máxima eficiencia
+   
+
     if categoria == "TODAS":
-        datos = cargarDatosCSV()
-        if datos is None:
+
+        try:
+            arch = open(nombre_archivo, "r")
+        except:
+            print("No se pudo abrir el archivo.")
             return
 
-        (lista_fecha,
-         lista_id_producto,
-         lista_producto,
-         lista_categoria,   
-         lista_id_cliente,
-         lista_cliente,
-         lista_cantidad,
-         lista_precio,
-         lista_region,
-         lista_canal,
-         lista_factura) = datos
+        primero = True
 
-        # acumulado: [cliente, total_facturado]
-        acumulado = []
+        # Diccionario:
+        # producto : [unidades_totales, facturacion_total]
+        acumulado = {}
 
-        i = 0
-        while i < len(lista_cliente):
-            cli = lista_cliente[i]
-            if cli is None or cli == "":
-                i = i + 1
+        # ----------- Primera pasada: acumular ventas por producto -----------
+        for linea in arch:
+            linea = linea.strip()
+            if linea == "":
                 continue
 
+            if primero:
+                primero = False
+                continue
+
+            partes = linea.split(",")
+            if len(partes) < 11:
+                continue
+
+            producto = partes[2]
+            if producto is None or producto == "":
+                continue
+
+            # Cantidad
             try:
-                cantidad = float(lista_cantidad[i])
+                cantidad = float(partes[6])
             except:
                 cantidad = 0.0
+
+            # Precio
             try:
-                precio = float(lista_precio[i])
+                precio = float(partes[7])
             except:
                 precio = 0.0
 
-            total = cantidad * precio
+            facturacion = cantidad * precio
 
-            j = logica.indiceEnLista(acumulado, cli)
-            if j != -1:
-                acumulado[j][1] = acumulado[j][1] + total
-            else:
-                acumulado.append([cli, total])
+            # ---------------- Diccionario: acceso DIRECTO ----------------
+            if producto not in acumulado:
+                acumulado[producto] = [0.0, 0.0]
 
-            i = i + 1
+            acumulado[producto][0] += cantidad
+            acumulado[producto][1] += facturacion
 
+        arch.close()
+
+        # No hay productos válidos
         if len(acumulado) == 0:
-            print("\nNo hay clientes validos para mostrar.")
+            print("\nNo hay productos válidos para mostrar.")
             return
 
-        # ordenar desc por facturación
-        acumulado.sort(key=lambda fila: fila[1], reverse=True)
+      
+        # Convertir diccionario a lista para ordenar
+        
+        lista_prod = []
+        for prod in acumulado:
+            lista_prod.append([prod, acumulado[prod][0], acumulado[prod][1]])
 
-        # Top N (ajustá si querés)
-        if len(acumulado) > 10:
-            limite = 10
+        
+        # Crear dos copias: una para unidades y otra para facturación
+        
+        topUnidades = []
+        topFacturacion = []
+
+        i = 0
+        while i < len(lista_prod):
+            topUnidades.append(lista_prod[i])
+            topFacturacion.append(lista_prod[i])
+            i += 1
+
+        
+        # Ordenar topUnidades por unidades DESC (burbuja)
+        
+        i = 0
+        while i < len(topUnidades) - 1:
+            j = i + 1
+            while j < len(topUnidades):
+                if topUnidades[i][1] < topUnidades[j][1]:
+                    aux = topUnidades[i]
+                    topUnidades[i] = topUnidades[j]
+                    topUnidades[j] = aux
+                j += 1
+            i += 1
+
+        
+        # Ordenar topFacturacion por facturación DESC (burbuja)
+        
+        i = 0
+        while i < len(topFacturacion) - 1:
+            j = i + 1
+            while j < len(topFacturacion):
+                if topFacturacion[i][2] < topFacturacion[j][2]:
+                    aux = topFacturacion[i]
+                    topFacturacion[i] = topFacturacion[j]
+                    topFacturacion[j] = aux
+                j += 1
+            i += 1
+
+        
+        # Determinar límite del Top 5
+        
+        if len(lista_prod) > 5:
+            limite = 5
         else:
-            limite = len(acumulado)
+            limite = len(lista_prod)
 
-        # total general para participación
-        total_general = 0.0
-        t = 0
-        while t < len(acumulado):
-            total_general = total_general + acumulado[t][1]
-            t = t + 1
+        
+        # Imprimir tabla
+        
+        print("\nTOP 5 PRODUCTOS — TODAS LAS CATEGORÍAS")
+        print("-" * 90)
+        print("%-5s%-35s%-25s%-20s" % ("#", "Producto", "Unidades Totales", "Facturación Total"))
+        print("-" * 90)
 
-        print("\nClientes mas relevantes (TODAS las categorias):")
-        print("-" * 60)
-        print(f"{'Cliente':<28}{'Total ($)':>16}{'Participacion':>16}")
-        print("-" * 60)
+        fila = 0
+        while fila < limite:
+            p_un = topUnidades[fila][0]
+            unidades = int(topUnidades[fila][1])
+            p_fac = topFacturacion[fila][0]
+            fact = topFacturacion[fila][2]
 
-        k = 0
-        while k < limite:
-            cli = acumulado[k][0]
-            tot = acumulado[k][1]
-            if total_general > 0:
-                part = (tot * 100.0) / total_general
-            else:
-                part = 0.0
-            print(f"{cli:<28}{tot:>16.2f}{part:>15.1f}%")
-            k = k + 1
+            print("%-5d%-35s%-25d$%-19.2f" %
+                  (fila + 1, p_un, unidades, fact))
 
-        print("-" * 60)
-        print(f"{'TOTAL':<28}{total_general:>16.2f}{'100.0%':>16}")
-        return  # <-- importantísimo para no caer en la rama de abajo
+            fila += 1
 
-    # Categoria especifica: ventas separadas por categoria
-    datos = logica.filtrarPorCategoria(categoria)
-    if datos is None:
+        return  # FIN CASO TODAS
+
+    
+    # CASO 2 — UNA CATEGORÍA ESPECÍFICA
+    
+
+    try:
+        arch = open(nombre_archivo, "r")
+    except:
+        print("No se pudo abrir el archivo.")
         return
 
-    (lista_fecha,
-     lista_id_producto,
-     lista_producto,
-     lista_id_cliente,
-     lista_cliente,
-     lista_cantidad,
-     lista_precio,
-     lista_region,
-     lista_canal,
-     lista_factura) = datos  # 10 listas
+    primero = True
 
-    acumulado = []  # [cliente, total]
+    # Diccionario para acumular SOLO los productos de esa categoría
+    acumulado = {}     # producto : [unidades, facturacion]
 
-    i = 0
-    while i < len(lista_cliente):
-        cli = lista_cliente[i]
-        if cli is None or cli == "":
-            i = i + 1
+    # ----------- Recorrer archivo -----------
+    for linea in arch:
+        linea = linea.strip()
+        if linea == "":
+            continue
+
+        if primero:
+            primero = False
+            continue
+
+        partes = linea.split(",")
+        if len(partes) < 11:
+            continue
+
+        producto = partes[2]
+        categoria_actual = partes[3]
+
+        # Filtrar categoría
+        if categoria_actual != categoria:
+            continue
+
+        if producto is None or producto == "":
             continue
 
         try:
-            cantidad = float(lista_cantidad[i])
+            cantidad = float(partes[6])
+        except:
+            cantidad = 0.0
+
+        try:
+            precio = float(partes[7])
+        except:
+            precio = 0.0
+
+        facturacion = cantidad * precio
+
+        # Diccionario → acceso directo
+        if producto not in acumulado:
+            acumulado[producto] = [0.0, 0.0]
+
+        acumulado[producto][0] += cantidad
+        acumulado[producto][1] += facturacion
+
+    arch.close()
+
+    if len(acumulado) == 0:
+        print("\nNo hay productos válidos para mostrar.")
+        return
+
+   
+    # Convertir a lista para ordenar
+    
+    lista_prod = []
+    for p in acumulado:
+        lista_prod.append([p, acumulado[p][0], acumulado[p][1]])
+
+    topUnidades = []
+    topFacturacion = []
+
+    i = 0
+    while i < len(lista_prod):
+        topUnidades.append(lista_prod[i])
+        topFacturacion.append(lista_prod[i])
+        i += 1
+    
+    # Ordenar
+    # Unidades DESC
+    i = 0
+    while i < len(topUnidades) - 1:
+        j = i + 1
+        while j < len(topUnidades):
+            if topUnidades[i][1] < topUnidades[j][1]:
+                aux = topUnidades[i]
+                topUnidades[i] = topUnidades[j]
+                topUnidades[j] = aux
+            j += 1
+        i += 1
+
+    # Facturación DESC
+    i = 0
+    while i < len(topFacturacion) - 1:
+        j = i + 1
+        while j < len(topFacturacion):
+            if topFacturacion[i][2] < topFacturacion[j][2]:
+                aux = topFacturacion[i]
+                topFacturacion[i] = topFacturacion[j]
+                topFacturacion[j] = aux
+            j += 1
+        i += 1
+
+    # Limitar a Top 5
+    if len(lista_prod) > 5:
+        limite = 5
+    else:
+        limite = len(lista_prod)
+
+    
+    # Imprimir resultados
+    
+    print(f"\nTOP 5 PRODUCTOS DE LA CATEGORÍA '{categoria}'")
+    print("-" * 90)
+    print("%-5s%-35s%-25s%-20s" %
+          ("#", "Producto", "Unidades Totales", "Facturación Total"))
+    print("-" * 90)
+
+    fila = 0
+    while fila < limite:
+        p = topUnidades[fila][0]
+        unidades = int(topUnidades[fila][1])
+        fact = topFacturacion[fila][2]
+
+        print("%-5d%-35s%-25d$%-19.2f" %
+              (fila + 1, p, unidades, fact))
+
+        fila += 1
+
+def clientesMasRelevantes(categoria="TODAS"):
+    """
+    Muestra el TOP de clientes más relevantes por facturación.
+    - Si categoria == "TODAS": considera todas las ventas.
+    - Si se pasa una categoría específica: filtra solo esas ventas.
+    """
+
+    try:
+        arch = open(nombre_archivo, "r")
+    except:
+        print("No se pudo abrir el archivo:", nombre_archivo)
+        return
+
+    primera_linea = True
+
+    # diccionario: cliente -> total_facturado
+    facturacion_por_cliente = {}
+
+    for linea in arch:
+        linea = linea.strip()
+        if not linea:
+            continue
+
+        # saltar encabezado
+        if primera_linea:
+            primera_linea = False
+            continue
+
+        # Revisar que la venta tenga datos completos
+        partes = linea.split(",")
+        if len(partes) < 11:
+            continue
+
+        # Extraemos categoria y cliente
+        cat_actual = partes[3].strip()
+        cliente = partes[5].strip()
+
+        if not cliente:
+            continue
+
+        # filtro por categoría si no es "TODAS"
+        if categoria != "TODAS" and cat_actual != categoria:
+            continue
+
+        # Calculamos facturación
+        try:
+            cantidad = float(partes[6])
         except:
             cantidad = 0.0
         try:
-            precio = float(lista_precio[i])
+            precio = float(partes[7])
         except:
             precio = 0.0
 
         total = cantidad * precio
 
-        j = logica.indiceEnLista(acumulado, cli)
-        if j != -1:
-            acumulado[j][1] = acumulado[j][1] + total
+        if cliente in facturacion_por_cliente:
+            facturacion_por_cliente[cliente] += total
         else:
-            acumulado.append([cli, total])
+            facturacion_por_cliente[cliente] = total
 
-        i = i + 1
+    arch.close()
+
+    # Pasamos a lista acumuladora para ordenar: [cliente, total]
+    acumulado = []
+    for cli, total in facturacion_por_cliente.items():
+        acumulado.append([cli, total])
 
     if len(acumulado) == 0:
-        print("\nNo hay clientes validos para mostrar en esa categoria.")
+        if categoria == "TODAS":
+            print("\nNo hay clientes válidos para mostrar.")
+        else:
+            print("\nNo hay clientes válidos para mostrar en esa categoría.")
         return
 
+    # ordenar desc por facturación
     acumulado.sort(key=lambda fila: fila[1], reverse=True)
 
     # Top N
@@ -618,15 +583,21 @@ def clientesMasRelevantes(categoria="TODAS"):
     else:
         limite = len(acumulado)
 
+    # total general para participación
     total_general = 0.0
     t = 0
     while t < len(acumulado):
-        total_general = total_general + acumulado[t][1]
-        t = t + 1
+        total_general += acumulado[t][1]
+        t += 1
 
-    print(f"\nClientes mas relevantes en '{categoria}' (por facturacion):")
+    # Título según categoría
+    if categoria == "TODAS":
+        print("\nClientes más relevantes (TODAS las categorías):")
+    else:
+        print(f"\nClientes más relevantes en '{categoria}' (por facturación):")
+
     print("-" * 60)
-    print(f"{'Cliente':<28}{'Total ($)':>16}{'Participacion':>16}")
+    print(f"{'Cliente':<28}{'Total ($)':>16}{'Participación':>16}")
     print("-" * 60)
 
     k = 0
@@ -638,298 +609,257 @@ def clientesMasRelevantes(categoria="TODAS"):
         else:
             part = 0.0
         print(f"{cli:<28}{tot:>16.2f}{part:>15.1f}%")
-        k = k + 1
+        k += 1
 
     print("-" * 60)
     print(f"{'TOTAL':<28}{total_general:>16.2f}{'100.0%':>16}")
 
+
 def ticketPromedioDeVenta(categoria="TODAS"):
-    # CASO 1: TODAS -> ticket de todas las ventas
-    if categoria == "TODAS":
-        datos = cargarDatosCSV()
-        if datos is None:
-            return
-
-        (lista_fecha,
-         lista_id_producto,
-         lista_producto,
-         lista_categoria,
-         lista_id_cliente,
-         lista_cliente,
-         lista_cantidad,
-         lista_precio,
-         lista_region,
-         lista_canal,
-         lista_factura) = datos
-
-        total_facturacion = 0.0
-        cantidad_ventas = 0
-
-        i = 0
-        while i < len(lista_cantidad):
-            try:
-                cantidad = float(lista_cantidad[i])
-            except:
-                cantidad = 0.0
-            try:
-                precio = float(lista_precio[i])
-            except:
-                precio = 0.0
-
-            if cantidad > 0 and precio > 0:
-                total_facturacion = total_facturacion + (cantidad * precio)
-                cantidad_ventas = cantidad_ventas + 1
-
-            i = i + 1
-
-        print("\n========= TICKET PROMEDIO (TODAS LAS VENTAS) =========")
-        if cantidad_ventas == 0:
-            print("No hay ventas validas en el archivo.")
-            return
-
-        ticket_promedio = total_facturacion / cantidad_ventas
-        print(f"Ventas procesadas: {cantidad_ventas}")
-        print(f"Facturacion total: ${total_facturacion:,.2f}")
-        print(f"Ticket promedio:  ${ticket_promedio:,.2f}")
-        print("===========================================")
-        return  # fin caso TODAS
-
-    # CASO 2: Categoria especifica
-    datos = logica.filtrarPorCategoria(categoria)
-    if datos is None:
+    # Abrimos el archivo
+    try:
+        arch = open(nombre_archivo, "r")
+    except:
+        print("No se pudo abrir el archivo.")
         return
 
-    (lista_fecha,
-     lista_id_producto,
-     lista_producto,
-     lista_id_cliente,
-     lista_cliente,
-     lista_cantidad,
-     lista_precio,
-     lista_region,
-     lista_canal,
-     lista_factura) = datos
-
+    # Inicializamos variables
+    primero = True
     total_facturacion = 0.0
     cantidad_ventas = 0
 
-    i = 0
-    while i < len(lista_cantidad):
+    # Recorremos archivo
+    for linea in arch:
+        linea = linea.strip()
+        if linea == "":
+            continue
+        
+        # Se salta la primera linea
+        if primero:
+            primero = False
+            continue
+
+        # Separa los atributos de la venta y revisa que esten completos
+        partes = linea.split(",")
+        if len(partes) < 11:
+            continue
+
+        # Extrae la categoria del producto vendido
+        cat_actual = partes[3]
+
+        # filtro por categoría si corresponde
+        if categoria != "TODAS" and cat_actual != categoria:
+            continue
+
+        # Extrae cantidad y precio
         try:
-            cantidad = float(lista_cantidad[i])
+            cantidad = float(partes[6])
         except:
             cantidad = 0.0
         try:
-            precio = float(lista_precio[i])
+            precio = float(partes[7])
         except:
             precio = 0.0
 
+        # Si la cantidad y el precio son mayores que 0, suma al total
         if cantidad > 0 and precio > 0:
             total_facturacion = total_facturacion + (cantidad * precio)
             cantidad_ventas = cantidad_ventas + 1
 
-        i = i + 1
+    arch.close()
 
+    # Imprime el menu
     print(f"\n========= TICKET PROMEDIO (VENTAS DE {categoria}) =========")
     if cantidad_ventas == 0:
         print("No hay ventas validas en esa categoria.")
         return
 
+    # Calcula ticket promedio si hay ventas
     ticket_promedio = total_facturacion / cantidad_ventas
     print(f"Ventas procesadas: {cantidad_ventas}")
     print(f"Facturacion total: ${total_facturacion:,.2f}")
     print(f"Ticket promedio:  ${ticket_promedio:,.2f}")
     print("==============================================")
    
-def ventasPorPeriodo(categoria="TODAS"):
-    # Seleccion de dataset segun categoria
-    if categoria == "TODAS":
-        datos = cargarDatosCSV()
-        if datos is None:
-            return
-        (lista_fecha,
-         lista_id_producto,
-         lista_producto,
-         lista_categoria,
-         lista_id_cliente,
-         lista_cliente,
-         lista_cantidad,
-         lista_precio,
-         lista_region,
-         lista_canal,
-         lista_factura) = datos
-    else:
-        datos = logica.filtrarPorCategoria(categoria)
-        if datos is None:
-            return
-        (lista_fecha,
-         lista_id_producto,
-         lista_producto,
-         lista_id_cliente,
-         lista_cliente,
-         lista_cantidad,
-         lista_precio,
-         lista_region,
-         lista_canal,
-         lista_factura) = datos  # 10 listas
+def ventasPorPeriodo(eleccion="TODAS"):
 
-    """
-    Analiza las ventas en un periodo específico.
-    Ve distribución por mes y por trimestre, con % de crecimiento entre el 1.º
-    y 4.º trimestre.
-    """
+    # ==========================================================================
+    # PRIMERA PASADA: recolectar AÑOS (base)
+    # ==========================================================================
+    try:
+        arch = open(nombre_archivo, "r")
+    except:
+        print("No se pudo abrir el archivo.")
+        return
 
-    # Extraer años y acumular ventas por mes (sin separar por año)
-    lista_anio = []
-    ventas_mes = []
-    for i in range(12):
-        ventas_mes.append(0.0)
+    primero = True
+    anios_dict = {}   # año -> True
 
-    # Crear listas auxiliares para años únicos y sus totales
-    anios_unicos = []
-    ventas_anio = []
+    for linea in arch:
+        linea = linea.strip()
+        if linea == "":
+            continue
+        if primero:
+            primero = False
+            continue
 
-    i = 0
-    while i < len(lista_fecha):
-        fecha = lista_fecha[i]
+        partes = linea.split(",")
+        if len(partes) < 11:
+            continue
+
+        fecha = partes[0]
+        categoria = partes[3]
+
+        # Obtener año y mes del formato YYYY-MM-...
+        if "-" not in fecha:
+            continue
+        pedazos = fecha.split("-")
+        if len(pedazos) < 2:
+            continue
         try:
-            cant = float(lista_cantidad[i])
+            anio = int(pedazos[0])
+            mes = int(pedazos[1])
         except:
-            cant = 0.0
+            continue
 
-        # Detectar formato de fecha
-        mes_num = 0
-        anio = "0"
-        if "-" in fecha:
-            partes = fecha.split("-")  # formato YYYY-MM-DD
-            if len(partes) >= 2:
-                anio = partes[0]
-                try:
-                    mes_num = int(partes[1])
-                except:
-                    mes_num = 0
-        else:
-            if "/" in fecha:
-                partes = fecha.split("/")
-                if len(partes) >= 3:
-                    anio = partes[2]
-                    try:
-                        mes_num = int(partes[1])
-                    except:
-                        mes_num = 0
+        # Filtro por categoría (si corresponde)
+        if eleccion != "TODAS" and categoria != eleccion:
+            continue
 
-        lista_anio.append(anio)
+        # Registrar año
+        if anio not in anios_dict:
+            anios_dict[anio] = True
 
-        # Acumular ventas por mes
-        if mes_num >= 1 and mes_num <= 12:
-            ventas_mes[mes_num - 1] = ventas_mes[mes_num - 1] + cant
+    arch.close()
 
-        # Acumular ventas totales por año
-        repetido = 0
-        j = 0
-        while j < len(anios_unicos):
-            if anios_unicos[j] == anio:
-                repetido = 1
-                ventas_anio[j] = ventas_anio[j] + cant
-            j = j + 1
-        if repetido == 0 and anio != "0":
-            anios_unicos.append(anio)
-            ventas_anio.append(cant)
+    # Base de años (lista) y orden ascendente (burbuja)
+    lista_anios = list(anios_dict.keys())
+    if len(lista_anios) == 0:
+        print("\nNo hay datos para mostrar en el periodo seleccionado.")
+        return
 
-        i = i + 1
-
-    # Buscar año minimo y maximo 
-    if len(anios_unicos) > 0:
-        anio_menor = int(anios_unicos[0])
-        anio_mayor = int(anios_unicos[0])
-        i = 0
-        while i < len(anios_unicos):
-            actual = int(anios_unicos[i])
-            if actual < anio_menor:
-                anio_menor = actual
-            if actual > anio_mayor:
-                anio_mayor = actual
-            i = i + 1
-    else:
-        anio_menor = 0
-        anio_mayor = 0
-
-    # Cuadro comparativo de trimestres por año
-    print("\n")
-    if categoria == "TODAS":
-        mensaje3 = "Comparativa de Trimestres por Año (TODAS las categorias)"
-    else:
-        mensaje3 = "Comparativa de Trimestres por Año - Categoria: " + str(categoria)
-    cadena3 = mensaje3.center(90, ' ')
-    print(cadena3)
-    print("-" * 90)
-    print("%-10s%-14s%-14s%-14s%-14s%-10s" %
-          ("Anio", "Trim 1", "Trim 2", "Trim 3", "Trim 4", "% Crec. Anual"))
-    print("-" * 90)
-
-    # Calcular ventas por trimestre en cada año
     i = 0
-    while i < len(anios_unicos):
-        anio_actual = anios_unicos[i]
-        # inicializar totales trimestrales
-        trim1 = 0.0
-        trim2 = 0.0
-        trim3 = 0.0
-        trim4 = 0.0
+    while i < len(lista_anios) - 1:
+        j = i + 1
+        while j < len(lista_anios):
+            if lista_anios[i] > lista_anios[j]:
+                aux = lista_anios[i]
+                lista_anios[i] = lista_anios[j]
+                lista_anios[j] = aux
+            j += 1
+        i += 1
 
-        # recorrer todos los registros y acumular segun el mes
+    # Acumuladores por año (arrays paralelos): T1..T4
+    t1 = [0.0] * len(lista_anios)
+    t2 = [0.0] * len(lista_anios)
+    t3 = [0.0] * len(lista_anios)
+    t4 = [0.0] * len(lista_anios)
+
+    # ==========================================================================
+    # SEGUNDA PASADA: acumular ventas por AÑO y TRIMESTRE
+    # ==========================================================================
+    try:
+        arch = open(nombre_archivo, "r")
+    except:
+        print("No se pudo abrir el archivo en segunda pasada.")
+        return
+
+    primero = True
+
+    for linea in arch:
+        linea = linea.strip()
+        if linea == "":
+            continue
+        if primero:
+            primero = False
+            continue
+
+        partes = linea.split(",")
+        if len(partes) < 11:
+            continue
+
+        fecha = partes[0]
+        categoria = partes[3]
+
+        if "-" not in fecha:
+            continue
+        pedazos = fecha.split("-")
+        if len(pedazos) < 2:
+            continue
+        try:
+            anio = int(pedazos[0])
+            mes = int(pedazos[1])
+        except:
+            continue
+
+        if eleccion != "TODAS" and categoria != eleccion:
+            continue
+
+        # cantidad * precio (defensivo)
+        try:
+            cantidad = float(partes[6])
+        except:
+            cantidad = 0.0
+        try:
+            precio = float(partes[7])
+        except:
+            precio = 0.0
+
+        venta = cantidad * precio
+        if venta <= 0:
+            continue
+
+        # Buscar índice de año en lista_anios
+        ind = -1
         j = 0
-        while j < len(lista_fecha):
-            fecha = lista_fecha[j]
-            anio_fila = "0"
-            mes_num = 0
+        while j < len(lista_anios):
+            if lista_anios[j] == anio:
+                ind = j
+            j += 1
+        if ind == -1:
+            continue
 
-            if "-" in fecha:              
-                partes = fecha.split("-")
-                if len(partes) >= 2:
-                    anio_fila = partes[0]
-                    try:
-                        mes_num = int(partes[1])
-                    except:
-                        mes_num = 0
-            else:
-                if "/" in fecha:           
-                    partes = fecha.split("/")
-                    if len(partes) >= 3:
-                        anio_fila = partes[2]
-                        try:
-                            mes_num = int(partes[1])
-                        except:
-                            mes_num = 0
+        # Acumular por trimestre
+        if 1 <= mes <= 3:
+            t1[ind] += venta
+        elif 4 <= mes <= 6:
+            t2[ind] += venta
+        elif 7 <= mes <= 9:
+            t3[ind] += venta
+        elif 10 <= mes <= 12:
+            t4[ind] += venta
 
-            if anio_fila == anio_actual:
-                try:
-                    venta = float(lista_cantidad[j]) * float(lista_precio[j])
-                except:
-                    venta = 0.0
+    arch.close()
 
-                if mes_num >= 1 and mes_num <= 3:
-                    trim1 = trim1 + venta
-                else:
-                    if mes_num >= 4 and mes_num <= 6:
-                        trim2 = trim2 + venta
-                    else:
-                        if mes_num >= 7 and mes_num <= 9:
-                            trim3 = trim3 + venta
-                        else:
-                            if mes_num >= 10 and mes_num <= 12:
-                                trim4 = trim4 + venta
-            j = j + 1
+    # ==========================================================================
+    # MATRIZ: [Año, T1, T2, T3, T4, Crec% (T1->T4)]
+    # ==========================================================================
+    matriz = []
+    i = 0
+    while i < len(lista_anios):
+        anio = lista_anios[i]
+        v1 = t1[i]; v2 = t2[i]; v3 = t3[i]; v4 = t4[i]
+        crec = ((v4 - v1) / v1) * 100.0 if v1 != 0 else 0.0
+        matriz.append([anio, v1, v2, v3, v4, crec])
+        i += 1
 
-        # calcular crecimiento total del anio (Trim4 vs Trim1)
-        crec_anual = 0.0
-        if trim1 != 0:
-            crec_anual = ((trim4 - trim1) / trim1) * 100.0
+    # ==========================================================================
+    # SALIDA
+    # ==========================================================================
+    titulo = "Comparativa Trimestral (todas las categorías)" if eleccion == "TODAS" \
+             else f"Comparativa Trimestral - Categoría: {eleccion}"
+    print("\n" + titulo)
+    print("-" * 100)
+    print("%-8s%-18s%-18s%-18s%-18s%-18s" %
+          ("Año", "Trim 1", "Trim 2", "Trim 3", "Trim 4", "Crec. T1→T4 %"))
+    print("-" * 100)
 
-        print("%-10s%-14.2f%-14.2f%-14.2f%-14.2f%9.2f" %
-              (anio_actual, trim1, trim2, trim3, trim4, crec_anual), "%")
-
-        i = i + 1
+    i = 0
+    while i < len(matriz):
+        fila = matriz[i]
+        print("%-8d%-18.2f%-18.2f%-18.2f%-18.2f%-18.2f" %
+              (fila[0], fila[1], fila[2], fila[3], fila[4], fila[5]))
+        i += 1
 
 def comparativaProducto():
     datos = cargarDatosCSV()
@@ -1166,60 +1096,73 @@ def comparativaProducto():
         print(f"Total facturación: {total_f_global:.2f}")
 
 def comparativaCliente():
-   
-    datos = cargarDatosCSV()
-    if datos is None:
+    """
+    Comparativa de clientes - lectura directa del CSV
+    Opción 1: Comparar 2 clientes de una categoría
+    Opción 2: Comparar todas las categorías
+    """
+    try:
+        arch = open(nombre_archivo, "r")
+    except:
+        print("No se pudo abrir el archivo:", nombre_archivo)
         return
 
-    (lista_fecha,
-     lista_id_producto,
-     lista_producto,
-     lista_categoria,
-     lista_id_cliente,
-     lista_cliente,
-     lista_cantidad,
-     lista_precio,
-     lista_region,
-     lista_canal,
-     lista_factura) = datos
+    primera_linea = True
 
-    # acumulado: [cliente, categoria, facturacion_total]
-    acumulado = []
+    # diccionario: (cliente, categoria) -> facturacion_total
+    acumulado_dict = {}
 
-    i = 0
-    while i < len(lista_cliente):
-        cliente = lista_cliente[i]
-        categoria = lista_categoria[i]
+    # Recorremos archivo
+    for linea in arch:
+        linea = linea.strip()
+        if not linea:
+            continue
+        if primera_linea:
+            primera_linea = False
+            continue
+
+        partes = linea.split(",")
+        if len(partes) < 11:
+            continue
+
+        cliente = partes[5].strip()
+        categoria = partes[3].strip()
 
         # evitar filas sin cliente
-        if cliente is None or cliente == "":
-            i = i + 1
+        if not cliente:
             continue
 
         # numéricos seguros
         try:
-            cantidad = float(lista_cantidad[i])
+            cantidad = float(partes[6])
         except:
             cantidad = 0.0
         try:
-            precio = float(lista_precio[i])
+            precio = float(partes[7])
         except:
             precio = 0.0
 
         total = cantidad * precio
 
-        # buscar si el cliente ya está acumulado
-        idx = logica.indiceEnLista(acumulado, cliente)   # busca en columna 0
-        if idx != -1:
-            acumulado[idx][2] = acumulado[idx][2] + total
-        else:
-            acumulado.append([cliente, categoria, total])
+        # clave compuesta (cliente, categoria) para el diccionario
+        clave = (cliente, categoria)
 
-        i = i + 1
+        # Si la clave ya esta en el diccionario acumulado se agrega si no se crea una nueva fila
+        if clave in acumulado_dict:
+            acumulado_dict[clave] = acumulado_dict[clave] + total
+        else:
+            acumulado_dict[clave] = total
+
+    arch.close()
+
+    # acumulado: [cliente, categoria, facturacion_total]
+    acumulado = []
+    for (cliente, categoria), total in acumulado_dict.items():
+        acumulado.append([cliente, categoria, total])
 
     cantidadClientes = len(acumulado)
     if cantidadClientes < 1:
-        print("\n⚠️ No hay clientes para analizar.")
+        print("\n No hay clientes para analizar.")
         return
 
     # SUBMENÚ: tipo de comparativa
@@ -1228,29 +1171,17 @@ def comparativaCliente():
     print("2) Comparar TODAS las categorías")
     tipo = logica.validarInput(1, 2)
 
+    # Hasta acá tenemos una lista (acumulado) que tiene al cliente con su categoria y el su total de ventas
+
+    # =========================================================
     # OPCIÓN 1: comparar 2 clientes de una MISMA CATEGORÍA
+    # =========================================================
     if tipo == 1:
 
-        # 1) categorías únicas
-        categorias_unicas = []
-        i = 0
-        while i < len(acumulado):
-            cat_act = acumulado[i][1]
-            repetido = 0
-            j = 0
-            while j < len(categorias_unicas):
-                if categorias_unicas[j] == cat_act:
-                    repetido = 1
-                j = j + 1
-            if repetido == 0:
-                categorias_unicas.append(cat_act)
-            i = i + 1
+        # 1) CATEGORÍAS ÚNICAS basadas en lo ya acumulado
+        categorias_unicas = sorted(list({fila[1] for fila in acumulado}))
 
-        if len(categorias_unicas) == 0:
-            print("\n⚠️ No hay categorías para analizar.")
-            return
-
-        # 2) mostrar categorías
+        # 2) MOSTRAR CATEGORÍAS
         print("\nCategorías disponibles:")
         i = 0
         while i < len(categorias_unicas):
@@ -1260,7 +1191,7 @@ def comparativaCliente():
         opcion_cat = logica.validarInput(1, len(categorias_unicas))
         categoria_elegida = categorias_unicas[opcion_cat - 1]
 
-        # 3) armar lista de clientes de esa categoría
+        # 3) ARMAR LISTA DE CLIENTES DE ESA CATEGORÍA 
         clientes_cat = []
         i = 0
         while i < len(acumulado):
@@ -1270,10 +1201,10 @@ def comparativaCliente():
 
         cantidadClientesCat = len(clientes_cat)
         if cantidadClientesCat < 2:
-            print("\n⚠️ No hay suficientes clientes en esa categoría para comparar.")
+            print("\n No hay suficientes clientes en esa categoría para comparar.")
             return
 
-        # 4) mostrar clientes de esa categoría
+        # 4) MOSTRAR CLIENTES DE ESA CATEGORÍA
         print(f"\nClientes que compraron de la categoría: {categoria_elegida}")
         k = 0
         while k < cantidadClientesCat:
@@ -1285,10 +1216,10 @@ def comparativaCliente():
         opcion2 = logica.validarInput(1, cantidadClientesCat)
 
         while opcion1 == opcion2:
-            print("⚠️ Deben ser distintos.")
+            print("Deben ser distintos.")
             opcion2 = logica.validarInput(1, cantidadClientesCat)
 
-        cliente1 = clientes_cat[opcion1 - 1]   # [nombre, cat, total]
+        cliente1 = clientes_cat[opcion1 - 1]
         cliente2 = clientes_cat[opcion2 - 1]
 
         # Cálculo de participaciones dentro del par
@@ -1317,10 +1248,12 @@ def comparativaCliente():
         else:
             print("Ambos tienen la misma facturación.")
 
+    # =========================================================
     # OPCIÓN 2: comparar TODAS las CATEGORÍAS
+    # =========================================================
     elif tipo == 2:
 
-        # armar lista de categorías con totales [categoria, facturacion_total]
+        # ARMAR LISTA DE CATEGORÍAS CON TOTALES [categoria, facturacion_total]
         categorias = []
         i = 0
         while i < len(acumulado):
@@ -1342,10 +1275,10 @@ def comparativaCliente():
             i = i + 1
 
         if len(categorias) == 0:
-            print("\n⚠️ No hay categorías para comparar.")
+            print("\n No hay categorías para comparar.")
             return
 
-        # ordenar alfabéticamente las categorías (burbuja)
+        # ORDENAR ALFABÉTICAMENTE LAS CATEGORÍAS (BURBUJA)
         i = 0
         while i < len(categorias) - 1:
             j = i + 1
@@ -1357,14 +1290,14 @@ def comparativaCliente():
                 j = j + 1
             i = i + 1
 
-        # total global de facturación
+        # TOTAL GLOBAL DE FACTURACIÓN 
         total_global = 0.0
         i = 0
         while i < len(categorias):
             total_global = total_global + categorias[i][1]
             i = i + 1
 
-        # mostrar cuadro comparativo de categorías
+        # MOSTRAR CUADRO COMPARATIVO DE CATEGORÍAS 
         print("\nComparativa de TODAS las CATEGORÍAS (por facturación total)")
         print("-" * 70)
         print(f"{'Categoría':<25} {'Total ($)':>18} {'Participación':>14}")
@@ -1394,119 +1327,197 @@ def comparativaCliente():
                     categoria_top = categorias[i][0]
                 i = i + 1
 
-            print(f"\n🏆 La categoría con mayor facturación fue '{categoria_top}' con $ {mayor_fact:.2f}.")
+            print(f"\n La categoría con mayor facturación fue '{categoria_top}' con $ {mayor_fact:.2f}.")
 
-def tendenciaDeCrecimiento(categoria="TODAS"):
+def tendenciaDeCrecimiento(eleccion):
     """
-    Muestra la participacion (%) de cada mes en la facturacion total
-    (global o filtrada por una categoria especifica).
-
-    Para cada mes:
-    - suma (Cantidad * Precio_Unitario)
-    - calcula que % representa sobre el total
+    Tendencia ACUMULADA de facturación por mes (YYYY-MM).
+    - eleccion = "TODAS": todas las categorías
+    - eleccion = <nombre_categoria>: filtra esa categoría
     """
 
-    # Seleccion de dataset segun categoria
-    if categoria == "TODAS":
-        datos = cargarDatosCSV()
-        if datos is None:
-            print("No se pudieron cargar los datos de ventas.")
-            return
+    # ==========================================================================
+    # PRIMERA PASADA: recolectar MESES (YYYY-MM) como base
+    # ==========================================================================
+    try:
+        arch = open(nombre_archivo, "r")
+    except:
+        print("No se pudo abrir el archivo.")
+        return
 
-        lista_fecha      = datos[0]
-        lista_producto   = datos[2]
-        lista_id_cliente = datos[4]
-        lista_cliente    = datos[5]
-        lista_cantidad   = datos[6]
-        lista_precio     = datos[7]
-        lista_region     = datos[8]
-        lista_canal      = datos[9]
-        lista_factura    = datos[10]
-        titulo = "Porcentaje de ventas por mes (TODAS las categorias)"
-    else:
-        datos = logica.filtrarPorCategoria(categoria)
-        if datos is None:
-            print("No se pudieron cargar los datos de ventas.")
-            return
+    primero = True
+    meses_dict = {}  # "YYYY-MM" -> True
 
-        lista_fecha      = datos[0]
-        lista_id_producto= datos[1]
-        lista_producto   = datos[2]
-        lista_id_cliente = datos[3]
-        lista_cliente    = datos[4]
-        lista_cantidad   = datos[5]
-        lista_precio     = datos[6]
-        lista_region     = datos[7]
-        lista_canal      = datos[8]
-        lista_factura    = datos[9]
-        titulo = "Porcentaje de ventas por mes (Categoria: " + str(categoria) + ")"
+    for linea in arch:
+        linea = linea.strip()
+        if linea == "":
+            continue
+        if primero:
+            primero = False
+            continue
 
-    # Acumular facturacion por mes "YYYY-MM"
-    facturacion_por_mes = {}  # {"YYYY-MM": total}
+        partes = linea.split(",")
+        if len(partes) < 11:
+            continue
 
+        fecha = partes[0]
+        categoria = partes[3]
+
+        if eleccion != "TODAS" and categoria != eleccion:
+            continue
+
+        # Normalizar a "YYYY-MM" (soporta "YYYY-MM-..." y "DD/MM/YYYY")
+        clave_mes = ""
+        if "-" in fecha and len(fecha) >= 7:
+            clave_mes = fecha[:7]
+        elif "/" in fecha:
+            ped = fecha.split("/")
+            if len(ped) >= 3:
+                try:
+                    dd = int(ped[0]); mm = int(ped[1]); aa = int(ped[2])
+                    clave_mes = f"{aa:04d}-{mm:02d}"
+                except:
+                    pass
+
+        if clave_mes != "" and clave_mes not in meses_dict:
+            meses_dict[clave_mes] = True
+
+    arch.close()
+
+    meses = list(meses_dict.keys())
+    if len(meses) == 0:
+        print("\nNo hay datos para mostrar en la tendencia acumulada.")
+        return
+
+    # Orden cronológico (burbuja sobre "YYYY-MM")
     i = 0
-    while i < len(lista_fecha):
-        fecha_str = lista_fecha[i]
+    while i < len(meses) - 1:
+        j = i + 1
+        while j < len(meses):
+            if meses[i] > meses[j]:
+                aux = meses[i]; meses[i] = meses[j]; meses[j] = aux
+            j += 1
+        i += 1
 
+    # ==========================================================================
+    # SEGUNDA PASADA: acumular $ por MES (cantidad*precio)
+    # ==========================================================================
+    try:
+        arch = open(nombre_archivo, "r")
+    except:
+        print("No se pudo abrir el archivo en segunda pasada.")
+        return
+
+    primero = True
+    totales_por_mes = {}  # "YYYY-MM" -> total $
+
+    for linea in arch:
+        linea = linea.strip()
+        if linea == "":
+            continue
+        if primero:
+            primero = False
+            continue
+
+        partes = linea.split(",")
+        if len(partes) < 11:
+            continue
+
+        fecha = partes[0]
+        categoria = partes[3]
+
+        if eleccion != "TODAS" and categoria != eleccion:
+            continue
+
+        # Clave de mes
+        clave_mes = ""
+        if "-" in fecha and len(fecha) >= 7:
+            clave_mes = fecha[:7]
+        elif "/" in fecha:
+            ped = fecha.split("/")
+            if len(ped) >= 3:
+                try:
+                    dd = int(ped[0]); mm = int(ped[1]); aa = int(ped[2])
+                    clave_mes = f"{aa:04d}-{mm:02d}"
+                except:
+                    pass
+
+        if clave_mes == "":
+            continue
+
+        # cantidad y precio defensivos
         try:
-            cantidad = float(lista_cantidad[i])
+            cantidad = float(partes[6])
         except:
             cantidad = 0.0
         try:
-            precio_unit = float(lista_precio[i])
+            precio = float(partes[7])
         except:
-            precio_unit = 0.0
+            precio = 0.0
 
-        total_linea = cantidad * precio_unit
+        venta = cantidad * precio
+        if venta <= 0:
+            continue
 
-        # Clave de mes (suponemos YYYY-MM-DD)
-        clave_mes = ""
-        if isinstance(fecha_str, str) and len(fecha_str) >= 7:
-            clave_mes = fecha_str[:7]
+        if clave_mes in totales_por_mes:
+            totales_por_mes[clave_mes] += venta
+        else:
+            totales_por_mes[clave_mes] = venta
 
-        if clave_mes != "":
-            if clave_mes in facturacion_por_mes:
-                facturacion_por_mes[clave_mes] = facturacion_por_mes[clave_mes] + total_linea
-            else:
-                facturacion_por_mes[clave_mes] = total_linea
+    arch.close()
 
-        i = i + 1
+    # ==========================================================================
+    # Construir vectores ordenados y ACUMULADO
+    # ==========================================================================
+    montos_mes = []
+    i = 0
+    while i < len(meses):
+        m = meses[i]
+        montos_mes.append(totales_por_mes[m] if m in totales_por_mes else 0.0)
+        i += 1
 
-    # Orden cronologico de meses
-    meses_ordenados = sorted(facturacion_por_mes.keys())
+    acumulado = []
+    suma = 0.0
+    i = 0
+    while i < len(montos_mes):
+        suma += montos_mes[i]
+        acumulado.append(suma)
+        i += 1
 
-    # Total general
-    total_anual = 0.0
-    j = 0
-    while j < len(meses_ordenados):
-        mes_clave = meses_ordenados[j]
-        total_anual = total_anual + facturacion_por_mes[mes_clave]
-        j = j + 1
+    # Crecimiento acumulado % vs primer mes con ventas (>0)
+    idx_base = -1
+    i = 0
+    while i < len(acumulado):
+        if acumulado[i] > 0:
+            idx_base = i
+            break
+        i += 1
 
-    if total_anual == 0:
-        print("No hay facturacion en los datos.")
-        return
+    crec_acum_pct = []
+    i = 0
+    while i < len(acumulado):
+        if idx_base != -1 and acumulado[idx_base] > 0:
+            pct = ((acumulado[i] - acumulado[idx_base]) / acumulado[idx_base]) * 100.0
+        else:
+            pct = 0.0
+        crec_acum_pct.append(pct)
+        i += 1
 
-    # Tabla final
+    # ==========================================================================
+    # SALIDA
+    # ==========================================================================
+    titulo = "Tendencia de Crecimiento ACUMULADO (todas las categorías)" if eleccion == "TODAS" \
+             else f"Tendencia de Crecimiento ACUMULADO - Categoría: {eleccion}"
     print("\n" + titulo)
-    print("-" * 70)
-    print(f"{'Mes':<20}{'Facturacion ($)':<20}{'Participacion':<15}")
-    print("-" * 70)
+    print("-" * 96)
+    print("%-12s%-20s%-24s%-24s" % ("Mes", "Total Mes ($)", "Acumulado ($)", "Crec. Acum % (vs. base)"))
+    print("-" * 96)
 
-    k = 0
-    while k < len(meses_ordenados):
-        mes_clave = meses_ordenados[k]
-        fact_mes = facturacion_por_mes[mes_clave]
-        porcentaje = (fact_mes * 100.0) / total_anual
-
-        etiqueta = logica.formatear_mes(mes_clave)
-
-        print(f"{etiqueta:<20}{fact_mes:<20.2f}{porcentaje:>10.1f}%")
-        k = k + 1
-
-    print("-" * 70)
-    print(f"{'TOTAL':<20}{total_anual:<20.2f}{'100.0%':>10}")
-    print()
+    i = 0
+    while i < len(meses):
+        print("%-12s%-20.2f%-24.2f%-24.2f" %
+              (meses[i], montos_mes[i], acumulado[i], crec_acum_pct[i]))
+        i += 1
 
 
 def comparativaCanal(categoria="TODAS"):
@@ -1516,54 +1527,59 @@ def comparativaCanal(categoria="TODAS"):
     Separa por categoria o toma todos los datos
     """
 
-    # Seleccion de dataset segun categoria
-    if categoria == "TODAS":
-        datos = cargarDatosCSV()
-        if datos is None:
-            print("No se pudieron cargar los datos de ventas.")
-            return
+    try:
+        arch = open(nombre_archivo, "r")
+    except:
+        print("No se pudieron cargar los datos de ventas.")
+        return
 
-        lista_cantidad = datos[6]
-        lista_precio   = datos[7]
-        lista_canal    = datos[9]
-        titulo = "Comparativa de ventas por canal (TODAS las categorias)"
-    else:
-        datos = logica.filtrarPorCategoria(categoria)
-        if datos is None:
-            print("No se pudieron cargar los datos de ventas.")
-            return
-
-        lista_cantidad = datos[5]
-        lista_precio   = datos[6]
-        lista_canal    = datos[8]
-        titulo = "Comparativa de ventas por canal (Categoria: " + str(categoria) + ")"
-
-    # Acumular facturacion total por canal
+    primero = True
     facturacion_por_canal = {}  # {'Online': 12345.0, ...}
 
-    i = 0
-    while i < len(lista_canal):
-        canal = lista_canal[i]
+    for linea in arch:
+        linea = linea.strip()
+        if linea == "":
+            continue
 
+        # saltear encabezado
+        if primero:
+            primero = False
+            continue
+
+        partes = linea.split(",")
+        # esperamos al menos 10–11 columnas
+        if len(partes) < 10:
+            continue
+
+        # Extraemos categoria y canal de la venta
+        cat_actual = partes[3]
+        canal = partes[9]
+    
+        # filtro por categoría si corresponde
+        if categoria != "TODAS" and cat_actual != categoria:
+            continue
+
+        # extraemos cantidad y precio 
         try:
-            cantidad = float(lista_cantidad[i])
+            cantidad = float(partes[6])
         except:
             cantidad = 0.0
         try:
-            precio = float(lista_precio[i])
+            precio = float(partes[7])
         except:
             precio = 0.0
 
         total = cantidad * precio
 
+        # acumular por canal en el diccionario
         if canal in facturacion_por_canal:
             facturacion_por_canal[canal] = facturacion_por_canal[canal] + total
         else:
             facturacion_por_canal[canal] = total
 
-        i = i + 1
+    arch.close()
 
-    # Total general (manual) y chequeo
+    # Total general
     total_general = 0.0
     for k in facturacion_por_canal:
         total_general = total_general + facturacion_por_canal[k]
@@ -1572,11 +1588,17 @@ def comparativaCanal(categoria="TODAS"):
         print("No se registraron ventas.")
         return
 
-    # Ordenar por facturacion desc
+    # Ordenar por facturación DESC
     canales_items = []
     for k in facturacion_por_canal:
         canales_items.append([k, facturacion_por_canal[k]])
     canales_items.sort(key=lambda x: x[1], reverse=True)
+
+    # Título según categoría
+    if categoria == "TODAS":
+        titulo = "Comparativa de ventas por canal (TODAS las categorias)"
+    else:
+        titulo = "Comparativa de ventas por canal (Categoria: " + str(categoria) + ")"
 
     # Mostrar resultados
     print("\n" + titulo)

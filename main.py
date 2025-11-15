@@ -47,18 +47,25 @@ def imprimirMenuDeCategorias():
     
 # Regreso al menu principal
 def salidaMenuInicio():
-    print("\n")
-    print("Ingrese 0 para volver al menu de principal")
-    eleccion2 = logica.validarInput(0, 0)
-    while eleccion2 != 0:
-        logica.error()
-        print("Ingrese 0 para volver al menu de principal")
-        eleccion2 = logica.validarInput(0, 0)
-    
-    if eleccion2 == 0:
-        printMainMenu()
-        eleccion3 = logica.validarInput(0, 8)
-        return eleccion3
+    while True:
+        print("\n")
+        print("Ingrese 0 para volver al menu principal")
+
+        try:
+            eleccion2 = int(input("> "))
+            if eleccion2 == 0:
+                break  # salgo del while y voy al menú principal
+            else:
+                # cualquier cosa distinta de 0: muestro error y vuelvo a pedir
+                logica.error()
+        except ValueError:
+            # si escribe letras, vacío, etc.
+            logica.error()
+
+    # acá ya sabemos que eligió 0
+    printMainMenu()
+    eleccion3 = logica.validarInput(0, 8)
+    return eleccion3
     
 # Menu principal #
 
@@ -85,7 +92,7 @@ def printMainMenu():
 def menu():
 
     printMainMenu()
-    eleccion = logica.validarInput(0, 9)
+    eleccion = logica.validarInput(0, 8)
     
     while eleccion != 0:
 
