@@ -862,56 +862,66 @@ def ventasPorPeriodo(eleccion="TODAS"):
         i += 1
 
 def comparativaProducto():
-    datos = cargarDatosCSV()
-    if datos is None:
+    """
+    Comparativa de productos - usando solo contenidos vistos en la materia
+    Python básico, listas, bucles, archivos CSV
+    """
+    try:
+        arch = open(nombre_archivo, "r")
+    except:
+        print("No se pudo abrir el archivo:", archivo)
         return
 
-    (lista_fecha,
-     lista_id_producto,
-     lista_producto,
-     lista_categoria,
-     lista_id_cliente,
-     lista_cliente,
-     lista_cantidad,
-     lista_precio,
-     lista_region,
-     lista_canal,
-     lista_factura) = datos
-
-    # acumulado: [producto, categoria, unidadesTotales, facturacionTotal]
+    primera_linea = True
+    # acumulado: [producto, categoria, unidades_totales, facturacion_total]
     acumulado = []
 
-    i = 0
-    while i < len(lista_producto):
-        prod = lista_producto[i]
-        cat = lista_categoria[i]
-
-        # evitar productos vacíos
-        if prod is None or prod == "":
-            i = i + 1
+    # Leer archivo línea por línea
+    for linea in arch:
+        linea = linea.strip()
+        if not linea:
+            continue
+        if primera_linea:
+            primera_linea = False
             continue
 
-        # convertir a números seguros
+        partes = linea.split(",")  # Procesar CSV manualmente
+        if len(partes) < 11:
+            continue
+
+        producto = partes[2].strip()
+        categoria = partes[3].strip()
+
+        if not producto:
+            continue
+
+        # Conversión numérica segura
         try:
-            unidades = float(lista_cantidad[i])
+            cantidad = float(partes[6])
         except:
-            unidades = 0.0
+            cantidad = 0.0
         try:
-            precio = float(lista_precio[i])
+            precio = float(partes[7])
         except:
             precio = 0.0
 
-        total = unidades * precio
+        facturacion = cantidad * precio
 
-        # buscar si ya existe el producto en acumulado
-        idx = logica.indiceEnLista(acumulado, prod)
-        if idx != -1:
-            acumulado[idx][2] = acumulado[idx][2] + unidades
-            acumulado[idx][3] = acumulado[idx][3] + total
+        # Buscar si el producto ya está en acumulado
+        encontrado = -1
+        i = 0
+        while i < len(acumulado):
+            if acumulado[i][0] == producto:
+                encontrado = i
+            i += 1
+
+        if encontrado != -1:
+            acumulado[encontrado][2] = acumulado[encontrado][2] + cantidad
+            acumulado[encontrado][3] = acumulado[encontrado][3] + facturacion
         else:
-            acumulado.append([prod, cat, unidades, total])
+            acumulado.append([producto, categoria, cantidad, facturacion])
 
-        i = i + 1
+    arch.close()
 
     cantidadProductos = len(acumulado)
     if cantidadProductos < 1:
@@ -927,7 +937,7 @@ def comparativaProducto():
     # OPCIÓN 1: comparar 2 productos de una MISMA categoría
     if tipo == 1:
 
-        # armar lista de categorías únicas
+        # 1) categorías únicas (bucle while manual)
         categorias_unicas = []
         i = 0
         while i < len(acumulado):
@@ -946,6 +956,7 @@ def comparativaProducto():
             print("\n⚠️ No hay categorías para analizar.")
             return
 
+        # 2) mostrar categorías
         print("\nCategorías disponibles:")
         i = 0
         while i < len(categorias_unicas):
@@ -955,7 +966,7 @@ def comparativaProducto():
         opcion_cat = logica.validarInput(1, len(categorias_unicas))
         categoria_elegida = categorias_unicas[opcion_cat - 1]
 
-        # filtrar productos de esa categoría
+        # 3) armar lista de productos de esa categoría
         productos_cat = []
         i = 0
         while i < len(acumulado):
@@ -968,6 +979,7 @@ def comparativaProducto():
             print("\n⚠️ No hay suficientes productos en esa categoría para comparar.")
             return
 
+        # 4) mostrar productos de esa categoría
         print(f"\nProductos de la categoría: {categoria_elegida}")
         k = 0
         while k < cantidadProductosCat:
@@ -977,6 +989,7 @@ def comparativaProducto():
             print(f"{k+1}. {productos_cat[k][0]}  (u: {unidades_mostrar}, $: {productos_cat[k][3]:.2f})")
             k = k + 1
 
+        # 5) elegir dos productos
         opcion1 = logica.validarInput(1, cantidadProductosCat)
         opcion2 = logica.validarInput(1, cantidadProductosCat)
         while opcion1 == opcion2:
@@ -986,6 +999,7 @@ def comparativaProducto():
         producto1 = productos_cat[opcion1 - 1]
         producto2 = productos_cat[opcion2 - 1]
 
+        # Cálculos manuales
         totalUnidades = producto1[2] + producto2[2]
         totalFacturacion = producto1[3] + producto2[3]
 
@@ -1001,6 +1015,7 @@ def comparativaProducto():
         else:
             porcentajeFacturacion1, porcentajeFacturacion2 = 0.0, 0.0
 
+        # Mostrar comparativa
         print("\nComparativa de productos dentro de la categoría:", categoria_elegida)
         print("-" * 80)
         print(f"{'Producto':<25} {'Unidades':>10} {'Facturación ($)':>18} {'U%':>6} {'F%':>6}")
@@ -1018,6 +1033,7 @@ def comparativaProducto():
 
     # OPCIÓN 2: COMPARATIVA DE TODAS LAS CATEGORÍAS
     elif tipo == 2:
+
         # armar lista de categorías con sus totales [categoria, unidades, facturacion]
         categorias = []
         i = 0
@@ -1051,6 +1067,7 @@ def comparativaProducto():
             j = i + 1
             while j < len(categorias):
                 if categorias[i][0] > categorias[j][0]:
+                    # intercambiar filas
                     aux = categorias[i]
                     categorias[i] = categorias[j]
                     categorias[j] = aux
