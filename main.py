@@ -128,7 +128,7 @@ def menu():
             
         while eleccion == 6:
             imprimirMenuDeComparativas()
-            tipoDeComparativa = logica.validarInput(0, 3)
+            tipoDeComparativa = logica.validarInput(0, 2)
             if tipoDeComparativa == 1:
                 funcionalidades.comparativaProducto()
                 eleccion = salidaMenuInicio()
