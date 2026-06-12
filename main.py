@@ -2,7 +2,7 @@ import os
 import sys
 import funcionalidades
 import logica
-
+#ddddd
 # -- Helpers de UI -- #
 
 # Printea un minimenu para elegir tipo de comparativas #
